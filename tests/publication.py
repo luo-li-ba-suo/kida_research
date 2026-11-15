@@ -1,5 +1,6 @@
 """Test the daily upload path in an isolated copy of the project."""
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -9,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SLUG = 'example-reading-quicknote'
 URL = f'/notes/{SLUG}/'
 MARKER = 'PRIVATE-DRAFT-BODY-MUST-STAY-PRIVATE'
+# Resolve cached Bundler gems from the checkout, even when building a temporary copy.
+BUILD_ENV = dict(os.environ, BUNDLE_GEMFILE=str(ROOT / 'Gemfile'))
 ROOT_ITEMS = ('Gemfile', 'Gemfile.lock', 'settings.json', 'scripts', 'notes', 'site')
 
 with tempfile.TemporaryDirectory(prefix='research-notes-') as directory:
@@ -23,7 +26,7 @@ with tempfile.TemporaryDirectory(prefix='research-notes-') as directory:
     note = target / 'notes' / f'{SLUG}.html'
 
     def build():
-        subprocess.run(['bash', 'scripts/build.sh'], cwd=target, check=True)
+        subprocess.run(['bash', 'scripts/build.sh'], cwd=target, env=BUILD_ENV, check=True)
         return json.loads((target / '_site/search.json').read_text())
 
     note.write_text(source.replace('</article>', f'<p>{MARKER}</p></article>'))
@@ -51,7 +54,7 @@ with tempfile.TemporaryDirectory(prefix='research-notes-') as directory:
     duplicate = target / 'notes' / 'duplicate' / note.name
     duplicate.parent.mkdir()
     duplicate.write_text(revised)
-    rejected = subprocess.run(['bash', 'scripts/build.sh'], cwd=target, capture_output=True, text=True)
+    rejected = subprocess.run(['bash', 'scripts/build.sh'], cwd=target, env=BUILD_ENV, capture_output=True, text=True)
     assert rejected.returncode != 0 and '重复文章地址' in rejected.stderr
     assert 'name="note:updated" content="2026-11-16"' in rendered.read_text()
 
