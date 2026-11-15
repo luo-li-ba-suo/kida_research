@@ -1,0 +1,8 @@
+---
+layout: page
+title: Agentic RL
+permalink: /directions/agentic-rl/
+---
+<div class="page-heading"><p class="eyebrow">RESEARCH DIRECTION</p><h1>Agentic RL</h1><p class="lead">如何从交互经验中，学到可靠的决策？</p><p>从 off-policy 训练到长程信用分配，记录智能体学习中的机制与证据。</p></div>
+{% assign selected = site.data.notes | where_exp: 'note', "note.directions contains 'agentic-rl'" %}
+{% if selected.size > 0 %}{% include note-list.html notes=selected %}{% else %}<div class="empty-state"><h2>留一页给下一个问题。</h2><p>这个方向的第一篇笔记正在酝酿。已有的研究可以从<a href="/archive/">全部文章</a>继续阅读。</p></div>{% endif %}

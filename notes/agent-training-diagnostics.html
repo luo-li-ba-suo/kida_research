@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>训练诊断：先验证证据，再组合机制 · Research Notes</title>
+  <meta name="description" content="将训推失配、旧策略权重集中和信用证据不足分别变成可检查的训练问题。">
+  <meta name="note:title" content="训练诊断：先验证证据，再组合机制">
+  <meta name="note:slug" content="agent-training-diagnostics">
+  <meta name="note:summary" content="将训推失配、旧策略权重集中和信用证据不足分别变成可检查的训练问题。">
+  <meta name="note:directions" content="agentic-rl, reward-modeling">
+  <meta name="note:tags" content="信用分配, off-policy, 训练诊断">
+  <meta name="note:kind" content="synthesis">
+  <meta name="note:created" content="2026-11-15">
+  <meta name="note:updated" content="2026-11-15">
+  <meta name="note:status" content="published">
+  <style>
+/* Simple reading flow, independent of the old presentation's slide layout. */
+html{background:#fbfaf6;color:#263b38}body{margin:0;font:17px/1.95 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}*{box-sizing:border-box}a{color:#2e6258;text-underline-offset:4px}a:focus-visible,summary:focus-visible{outline:2px solid #2e6258;outline-offset:4px}.article-shell{max-width:870px;margin:auto;padding:0 40px}.article-nav{padding:24px 0;border-bottom:1px solid #dedfd7;display:flex;justify-content:space-between;font-size:13px}.article-nav a{text-decoration:none}.article-header{padding:48px 0 28px;border-bottom:1px solid #dedfd7;margin-bottom:30px}.eyebrow{font:11px/1.5 sans-serif;letter-spacing:.15em;color:#737e78}.article-header h1{font:500 34px/1.65 Georgia,"Songti SC",STSong,serif;letter-spacing:-.025em;margin:18px 0}.article-summary{color:#65716c;font-size:17px}.article-meta{font-size:12px;color:#737e78;display:flex;gap:14px;flex-wrap:wrap}.tags{font-size:12px;color:#2e6258;margin-top:12px}h2{font-size:24px;font-weight:500;line-height:1.6;margin:44px 0 18px}h3{font-size:20px;font-weight:500;margin:30px 0 16px}p{margin:0 0 20px}ul,ol{padding-left:26px}li{margin:8px 0}.reading-toc{padding:18px 24px;border:1px solid #dedfd7;font-size:14px;margin:28px 0}.reading-toc ol{margin-bottom:0}.reading-toc a{text-decoration:none}.reading-toc summary{cursor:pointer}.reading-section{margin:0 0 42px}.reading-section>h2{border-bottom:1px solid #dedfd7;padding-bottom:12px}.block-sub{font-size:16px;color:#65716c}.content,.split,.copy,.explain-grid,.explain-grid>div{display:block;width:100%}.problem-box{padding:16px 20px;margin:18px 0;background:#eef1e9;border-left:3px solid #8b9f88}.problem-box b{display:block;font-size:13px;color:#61765d;margin-bottom:5px}.problem-box span{display:block}.reason b{display:block;margin-bottom:6px}.math,.math-block{overflow-x:auto;padding:14px 0;margin:18px 0;font-size:.95em}.math-inline{font-size:.95em}.katex-display{margin:.5em 0}figure{margin:28px 0}img{max-width:100%;height:auto;display:block}svg{display:block;width:100%;height:auto;margin:24px auto}figcaption,.caption{font-size:13px;color:#737e78;line-height:1.7;margin-top:12px}.speaker,.supplement{padding:15px 20px;border:1px solid #dedfd7;margin:20px 0;font-size:14px}.speaker summary,.supplement summary{cursor:pointer;color:#65716c}.speaker p{margin:14px 0 0}.block-bottom{font-size:12px;margin:12px 0}.sources{display:flex;gap:14px;flex-wrap:wrap}table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto;margin:24px 0}td,th{padding:10px;border-bottom:1px solid #dedfd7;text-align:left}th{background:#eef1e9}pre{overflow:auto;background:#f0f1eb;padding:18px;font-size:13px}code{font-family:ui-monospace,SFMono-Regular,monospace}blockquote{border-left:3px solid #9aab91;padding:4px 20px;color:#65716c;margin:24px 0}.editorial{border-left:3px solid #a2b49b;padding:5px 20px;margin:28px 0}.editorial h2{font-size:17px;margin:0 0 10px}.verification{font-size:13px;color:#69736c;padding:16px 20px;background:#eef1e9;margin:24px 0}.article-footer{border-top:1px solid #dedfd7;margin-top:44px;padding:24px 0 40px;font-size:12px;color:#737e78}.related{padding:20px 0}.related ul{font-size:15px}.draft-banner{background:#f4e6c9;color:#7e5b20;padding:12px 20px;font-size:13px}.math-error{color:#a43d2b;background:#fff1e9;font-family:monospace}.figure-wrap{overflow:auto}a[href^="#"]{scroll-margin-top:20px}.reading-section{scroll-margin-top:20px}.paper-note{font-size:13px;color:#737e78}.source-label{font-size:12px;color:#737e78}
+@media(max-width:640px){body{font-size:16px}.article-shell{padding:0 22px}.article-header{padding-top:30px}.article-header h1{font-size:27px}h2{font-size:22px}.reading-toc{padding:15px}.article-nav{gap:20px}.math-block{font-size:.85em}.speaker{padding:12px}.article-meta{gap:8px 15px}}
+@media print{.article-nav,.reading-toc{display:none}body{font-size:11pt;background:white}.article-shell{max-width:none;padding:0}details> *{display:block}.reading-section{break-inside:auto}a{color:inherit}.article-header{padding-top:0}}
+
+.math-block math{min-width:max-content;margin:auto}
+.reference-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.take{border-left:2px solid #a2b49b;padding:8px 14px;margin:14px 0}
+.reading-section svg{background:#fff;border:1px solid #e3e5dc}
+
+  </style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const meta=name=>document.querySelector(`meta[name="note:${name}"]`)?.content||'';
+  document.querySelectorAll('[data-note-field]').forEach(el=>{const value=meta(el.dataset.noteField);
+    el.textContent=value;
+    if(el.tagName==='TIME')el.dateTime=value;});
+  if(meta('status')!=='published'){const banner=document.createElement('div');banner.className='draft-banner';banner.textContent='私人草稿 · 此状态不会进入公开网站';document.body.prepend(banner);}
+  document.title=meta('title')+' · Research Notes';
+  const description=document.querySelector('meta[name=description]');
+  if(description)description.content=meta('summary');
+  document.querySelectorAll('.math-block,.math-inline').forEach(el=>{
+    if(el.querySelector('math'))return;
+    const tex=el.textContent;el.dataset.latex=tex;
+    try{katex.render(tex,el,{displayMode:el.classList.contains('math-block'),throwOnError:true,trust:false,strict:'warn'});}
+    catch(error){el.textContent=tex;el.classList.add('math-error');el.title=error.message;}
+  });
+});
+
+</script>
+</head>
+<body>
+  <div class="article-shell">
+    <nav class="article-nav" aria-label="文章导航">
+      <a href="/">Kida / Research Notes</a>
+      <a href="/archive/">全部文章 →</a>
+    </nav>
+    <main>
+      <article>
+        <header class="article-header">
+          <p class="eyebrow">专题总结 · RESEARCH NOTES</p>
+          <h1 data-note-field="title">训练诊断：先验证证据，再组合机制</h1>
+          <p class="article-summary" data-note-field="summary">将训推失配、旧策略权重集中和信用证据不足分别变成可检查的训练问题。</p>
+          <div class="article-meta">
+            <span>首次发布 <time data-note-field="created" datetime="2026-11-15">2026-11-15</time></span>
+            <span>最近更新 <time data-note-field="updated" datetime="2026-11-15">2026-11-15</time></span>
+          </div>
+          <div class="tags">Agentic RL · Reward Modeling</div>
+        </header>
+
+<aside class="editorial">
+  <h2>阅读理解</h2>
+  <p>先建立可重复的观测，再尝试机制组合。建议同时记录 rollout 版本、训推同版本概率、ratio 尾部、ESS、梯度变化、任务成功率和状态重访覆盖。</p>
+</aside>
+
+<section class="reading-section" id="block-39">
+<h2>从训练现象到可检验的诊断</h2>
+<p class="block-sub">两条主线可以结合，但每个组合都需要实验证据</p><div class="content"><div class="split"><div class="copy"><p class="lead">Off-policy：<br/><b>可靠地使用已有数据。</b></p><p class="lead">信用分配：<br/><b>从轨迹中提取更有用的局部信号。</b></p><p class="small">主讲结束 · 留 2 分钟缓冲与讨论</p></div><div class="visual"><svg role="img" viewbox="0 0 660 420" xmlns="http://www.w3.org/2000/svg"><defs><marker id="s37arrow167465" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#167465"></path></marker><marker id="s37arrow193e37" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#193e37"></path></marker><marker id="s37arrow74867d" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#74867d"></path></marker><marker id="s37arrowb77a36" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#b77a36"></path></marker><marker id="s37arrowbc6252" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#bc6252"></path></marker><marker id="s37arrow537b9e" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#537b9e"></path></marker><marker id="s37arrowd7e3db" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#d7e3db"></path></marker></defs><rect fill="#fff" height="90" rx="12" stroke="#167465" stroke-width="2" width="610" x="25" y="40"></rect><text fill="#167465" font-size="23" font-weight="700" text-anchor="middle" x="330.0" y="85.0">训练不稳定</text><text fill="#74867d" font-size="16" font-weight="500" text-anchor="middle" x="330.0" y="115.0">检查训推概率差异、policy lag、ratio 尾部与 ESS</text><rect fill="#fff" height="90" rx="12" stroke="#537b9e" stroke-width="2" width="610" x="25" y="165"></rect><text fill="#537b9e" font-size="23" font-weight="700" text-anchor="middle" x="330.0" y="210.0">想改善局部信用</text><text fill="#74867d" font-size="16" font-weight="500" text-anchor="middle" x="330.0" y="240.0">检查重复状态覆盖，或验证评价器与进展代理是否可靠</text><rect fill="#fff" height="90" rx="12" stroke="#b77a36" stroke-width="2" width="610" x="25" y="290"></rect><text fill="#b77a36" font-size="23" font-weight="700" text-anchor="middle" x="330.0" y="335.0">任务确实有阶段结构</text><text fill="#74867d" font-size="16" font-weight="500" text-anchor="middle" x="330.0" y="365.0">再考虑子目标、轮次与 token 的不同时间尺度</text></svg></div></div></div><div class="block-bottom"><div class="sources"></div></div><details class="speaker"><summary>补充说明与适用边界</summary><p>面向GUI Agent，建议先诊断状态重复率和训练失配，形成可验收实验，再决定改造训练器。</p></details>
+</section>
+<section class="reading-section" id="block-47">
+<h2>原始论文索引</h2>
+<p class="block-sub">正文每页均有对应来源链接；教学图与论文实验图区分标记</p><div class="content"><div class="reference-grid"><a href="https://arxiv.org/html/2609.20807v1" rel="noopener" target="_blank"><b>SC</b><span>2609.20807v1</span></a><a href="https://arxiv.org/abs/2507.18071" rel="noopener" target="_blank"><b>GSPO</b><span>2507.18071</span></a><a href="https://arxiv.org/abs/2510.11370" rel="noopener" target="_blank"><b>R3</b><span>2510.11370</span></a><a href="https://arxiv.org/abs/2510.18855" rel="noopener" target="_blank"><b>IcePop</b><span>2510.18855</span></a><a href="https://arxiv.org/html/2510.01161v2" rel="noopener" target="_blank"><b>M2PO</b><span>2510.01161v2</span></a><a href="https://arxiv.org/html/2602.17616v2" rel="noopener" target="_blank"><b>VCPO</b><span>2602.17616v2</span></a><a href="https://arxiv.org/html/2505.10978v2" rel="noopener" target="_blank"><b>GiGPO</b><span>2505.10978v2</span></a><a href="https://arxiv.org/html/2605.26684v2" rel="noopener" target="_blank"><b>GraphGPO</b><span>2605.26684v2</span></a><a href="https://arxiv.org/abs/2503.15478" rel="noopener" target="_blank"><b>SWEET-RL</b><span>2503.15478</span></a><a href="https://arxiv.org/html/2603.08754v1" rel="noopener" target="_blank"><b>HCAPO</b><span>2603.08754v1</span></a><a href="https://arxiv.org/abs/2510.14967" rel="noopener" target="_blank"><b>IGPO</b><span>2510.14967</span></a><a href="https://arxiv.org/html/2607.13988v1" rel="noopener" target="_blank"><b>TRACE</b><span>2607.13988v1</span></a><a href="https://arxiv.org/abs/2509.19199" rel="noopener" target="_blank"><b>iStar</b><span>2509.19199</span></a><a href="https://arxiv.org/html/2603.23550v1" rel="noopener" target="_blank"><b>ITPO</b><span>2603.23550v1</span></a><a href="https://proceedings.mlr.press/v235/zhou24t.html" rel="noopener" target="_blank"><b>ArCHer</b><span>zhou24t.html</span></a><a href="https://arxiv.org/html/2602.16165v1" rel="noopener" target="_blank"><b>HiPER</b><span>2602.16165v1</span></a></div></div><div class="block-bottom"><div class="sources"></div></div>
+</section>
+<section>
+  <h2>下一步核对</h2>
+  <p>哪项诊断在实际 GUI 任务中最早预测失败？调整状态键后，图信用的覆盖与错误合并是否同步变化？</p>
+
+</section>
+<section class="related">
+  <h2>相关笔记</h2>
+  <ul><li><a href="/notes/off-policy-reliability/">Off-policy 训练的可靠性：分清两种不一致</a></li><li><a href="/notes/credit-assignment-map/">长程信用分配：从五类证据找到局部学习信号</a></li><li><a href="/notes/score-centering/">Score Centering：从平均 score 漂移理解 off-policy 不稳定</a></li><li><a href="/notes/graphgpo/">GraphGPO：连接已有轨迹，重新分配局部信用</a></li><li><a href="/notes/vcpo/">VCPO：用有效样本量判断更新强度</a></li></ul>
+</section>
+
+      </article>
+    </main>
+    <footer class="article-footer">Research Notes · <a href="/rss.xml">RSS 订阅</a></footer>
+  </div>
+</body>
+</html>

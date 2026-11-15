@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ITPO：把隐式奖励聚合到完整交互轮次 · Research Notes</title>
+  <meta name="description" content="将 token 级隐式奖励汇总到 turn，让局部反馈与环境执行的动作尺度对齐。">
+  <meta name="note:title" content="ITPO：把隐式奖励聚合到完整交互轮次">
+  <meta name="note:slug" content="itpo">
+  <meta name="note:summary" content="将 token 级隐式奖励汇总到 turn，让局部反馈与环境执行的动作尺度对齐。">
+  <meta name="note:directions" content="agentic-rl, reward-modeling">
+  <meta name="note:tags" content="过程奖励, 多轮交互">
+  <meta name="note:kind" content="paper">
+  <meta name="note:created" content="2026-11-15">
+  <meta name="note:updated" content="2026-11-15">
+  <meta name="note:status" content="published">
+  <style>
+/* Simple reading flow, independent of the old presentation's slide layout. */
+html{background:#fbfaf6;color:#263b38}body{margin:0;font:17px/1.95 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}*{box-sizing:border-box}a{color:#2e6258;text-underline-offset:4px}a:focus-visible,summary:focus-visible{outline:2px solid #2e6258;outline-offset:4px}.article-shell{max-width:870px;margin:auto;padding:0 40px}.article-nav{padding:24px 0;border-bottom:1px solid #dedfd7;display:flex;justify-content:space-between;font-size:13px}.article-nav a{text-decoration:none}.article-header{padding:48px 0 28px;border-bottom:1px solid #dedfd7;margin-bottom:30px}.eyebrow{font:11px/1.5 sans-serif;letter-spacing:.15em;color:#737e78}.article-header h1{font:500 34px/1.65 Georgia,"Songti SC",STSong,serif;letter-spacing:-.025em;margin:18px 0}.article-summary{color:#65716c;font-size:17px}.article-meta{font-size:12px;color:#737e78;display:flex;gap:14px;flex-wrap:wrap}.tags{font-size:12px;color:#2e6258;margin-top:12px}h2{font-size:24px;font-weight:500;line-height:1.6;margin:44px 0 18px}h3{font-size:20px;font-weight:500;margin:30px 0 16px}p{margin:0 0 20px}ul,ol{padding-left:26px}li{margin:8px 0}.reading-toc{padding:18px 24px;border:1px solid #dedfd7;font-size:14px;margin:28px 0}.reading-toc ol{margin-bottom:0}.reading-toc a{text-decoration:none}.reading-toc summary{cursor:pointer}.reading-section{margin:0 0 42px}.reading-section>h2{border-bottom:1px solid #dedfd7;padding-bottom:12px}.block-sub{font-size:16px;color:#65716c}.content,.split,.copy,.explain-grid,.explain-grid>div{display:block;width:100%}.problem-box{padding:16px 20px;margin:18px 0;background:#eef1e9;border-left:3px solid #8b9f88}.problem-box b{display:block;font-size:13px;color:#61765d;margin-bottom:5px}.problem-box span{display:block}.reason b{display:block;margin-bottom:6px}.math,.math-block{overflow-x:auto;padding:14px 0;margin:18px 0;font-size:.95em}.math-inline{font-size:.95em}.katex-display{margin:.5em 0}figure{margin:28px 0}img{max-width:100%;height:auto;display:block}svg{display:block;width:100%;height:auto;margin:24px auto}figcaption,.caption{font-size:13px;color:#737e78;line-height:1.7;margin-top:12px}.speaker,.supplement{padding:15px 20px;border:1px solid #dedfd7;margin:20px 0;font-size:14px}.speaker summary,.supplement summary{cursor:pointer;color:#65716c}.speaker p{margin:14px 0 0}.block-bottom{font-size:12px;margin:12px 0}.sources{display:flex;gap:14px;flex-wrap:wrap}table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto;margin:24px 0}td,th{padding:10px;border-bottom:1px solid #dedfd7;text-align:left}th{background:#eef1e9}pre{overflow:auto;background:#f0f1eb;padding:18px;font-size:13px}code{font-family:ui-monospace,SFMono-Regular,monospace}blockquote{border-left:3px solid #9aab91;padding:4px 20px;color:#65716c;margin:24px 0}.editorial{border-left:3px solid #a2b49b;padding:5px 20px;margin:28px 0}.editorial h2{font-size:17px;margin:0 0 10px}.verification{font-size:13px;color:#69736c;padding:16px 20px;background:#eef1e9;margin:24px 0}.article-footer{border-top:1px solid #dedfd7;margin-top:44px;padding:24px 0 40px;font-size:12px;color:#737e78}.related{padding:20px 0}.related ul{font-size:15px}.draft-banner{background:#f4e6c9;color:#7e5b20;padding:12px 20px;font-size:13px}.math-error{color:#a43d2b;background:#fff1e9;font-family:monospace}.figure-wrap{overflow:auto}a[href^="#"]{scroll-margin-top:20px}.reading-section{scroll-margin-top:20px}.paper-note{font-size:13px;color:#737e78}.source-label{font-size:12px;color:#737e78}
+@media(max-width:640px){body{font-size:16px}.article-shell{padding:0 22px}.article-header{padding-top:30px}.article-header h1{font-size:27px}h2{font-size:22px}.reading-toc{padding:15px}.article-nav{gap:20px}.math-block{font-size:.85em}.speaker{padding:12px}.article-meta{gap:8px 15px}}
+@media print{.article-nav,.reading-toc{display:none}body{font-size:11pt;background:white}.article-shell{max-width:none;padding:0}details> *{display:block}.reading-section{break-inside:auto}a{color:inherit}.article-header{padding-top:0}}
+
+.math-block math{min-width:max-content;margin:auto}
+.reference-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.take{border-left:2px solid #a2b49b;padding:8px 14px;margin:14px 0}
+.reading-section svg{background:#fff;border:1px solid #e3e5dc}
+
+  </style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const meta=name=>document.querySelector(`meta[name="note:${name}"]`)?.content||'';
+  document.querySelectorAll('[data-note-field]').forEach(el=>{const value=meta(el.dataset.noteField);
+    el.textContent=value;
+    if(el.tagName==='TIME')el.dateTime=value;});
+  if(meta('status')!=='published'){const banner=document.createElement('div');banner.className='draft-banner';banner.textContent='私人草稿 · 此状态不会进入公开网站';document.body.prepend(banner);}
+  document.title=meta('title')+' · Research Notes';
+  const description=document.querySelector('meta[name=description]');
+  if(description)description.content=meta('summary');
+  document.querySelectorAll('.math-block,.math-inline').forEach(el=>{
+    if(el.querySelector('math'))return;
+    const tex=el.textContent;el.dataset.latex=tex;
+    try{katex.render(tex,el,{displayMode:el.classList.contains('math-block'),throwOnError:true,trust:false,strict:'warn'});}
+    catch(error){el.textContent=tex;el.classList.add('math-error');el.title=error.message;}
+  });
+});
+
+</script>
+</head>
+<body>
+  <div class="article-shell">
+    <nav class="article-nav" aria-label="文章导航">
+      <a href="/">Kida / Research Notes</a>
+      <a href="/archive/">全部文章 →</a>
+    </nav>
+    <main>
+      <article>
+        <header class="article-header">
+          <p class="eyebrow">论文精读 · RESEARCH NOTES</p>
+          <h1 data-note-field="title">ITPO：把隐式奖励聚合到完整交互轮次</h1>
+          <p class="article-summary" data-note-field="summary">将 token 级隐式奖励汇总到 turn，让局部反馈与环境执行的动作尺度对齐。</p>
+          <div class="article-meta">
+            <span>首次发布 <time data-note-field="created" datetime="2026-11-15">2026-11-15</time></span>
+            <span>最近更新 <time data-note-field="updated" datetime="2026-11-15">2026-11-15</time></span>
+          </div>
+          <div class="tags">Agentic RL · Reward Modeling</div>
+        </header>
+
+<aside class="editorial">
+  <h2>阅读理解</h2>
+  <p>turn 是一种有用的决策单位；聚合和归一化方式仍需要与任务中的完整动作相匹配。</p>
+</aside>
+
+<section class="reading-section" id="block-36">
+<h2>ITPO：把 token 的隐式信号聚合到完整一轮</h2>
+<p class="block-sub">环境一次执行完整一轮，token 信号却过碎，怎样对齐？</p><div class="content"><div class="problem-box"><b>遇到的问题</b><span>一次工具调用的参数需要合起来才有意义。分散的 token 隐式奖励不直接对应“这一轮交互贡献了多少”。</span></div><div class="split"><div class="copy"><p class="reason"><b>怎么改</b>用整体结果监督训练隐式 PRM，将 token 奖励求和到 turn；可选地按轮次分数分配终局奖励。</p><div class="math"><span class="math-block"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mi>k</mi></msub><mo>=</mo><munder><mo>∑</mo><mrow><mi>t</mi><mo>∈</mo><mrow><mi mathvariant="normal">t</mi><mi mathvariant="normal">u</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">n</mi></mrow><mtext> </mtext><mi>k</mi></mrow></munder><msub><mi>r</mi><mi>t</mi></msub><mo separator="true">,</mo><mspace width="2em"></mspace><msub><mover accent="true"><mi>R</mi><mo stretchy="true">~</mo></mover><mi>k</mi></msub><mo>=</mo><mi mathvariant="normal">softmax</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>u</mi><mi mathvariant="normal">/</mi><mi>τ</mi><msub><mo stretchy="false">)</mo><mi>k</mi></msub><mi>R</mi></mrow><annotation encoding="application/x-tex">u_k=\sum_{t\in\mathrm{turn}\ k}r_t,\qquad \widetilde R_k=\operatorname{softmax}(u/\tau)_kR</annotation></semantics></math></span></div><p class="reason"><b>为何有效</b>让局部反馈与完整交互的尺度对齐；策略更新也在 turn 层面组织。</p></div><div class="visual"><svg role="img" viewbox="0 0 660 420" xmlns="http://www.w3.org/2000/svg"><defs><marker id="s34arrow167465" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#167465"></path></marker><marker id="s34arrow193e37" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#193e37"></path></marker><marker id="s34arrow74867d" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#74867d"></path></marker><marker id="s34arrowb77a36" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#b77a36"></path></marker><marker id="s34arrowbc6252" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#bc6252"></path></marker><marker id="s34arrow537b9e" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#537b9e"></path></marker><marker id="s34arrowd7e3db" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#d7e3db"></path></marker></defs><text fill="#74867d" font-size="19" font-weight="500" text-anchor="middle" x="65" y="75">Turn 1</text><rect fill="#167465" height="35" rx="3" stroke="#167465" stroke-width="2" width="45" x="135" y="55"></rect><text fill="white" font-size="15" font-weight="500" text-anchor="middle" x="157" y="79">0.1</text><rect fill="#bc6252" height="35" rx="3" stroke="#bc6252" stroke-width="2" width="45" x="193" y="55"></rect><text fill="white" font-size="15" font-weight="500" text-anchor="middle" x="215" y="79">-0.1</text><rect fill="#167465" height="35" rx="3" stroke="#167465" stroke-width="2" width="45" x="251" y="55"></rect><text fill="white" font-size="15" font-weight="500" text-anchor="middle" x="273" y="79">0.3</text><rect fill="#167465" height="35" rx="3" stroke="#167465" stroke-width="2" width="45" x="309" y="55"></rect><text fill="white" font-size="15" font-weight="500" text-anchor="middle" x="331" y="79">0.2</text><path d="M375,73 L435,73" fill="none" marker-end="url(#s34arrow167465)" stroke="#167465" stroke-width="3"></path><rect fill="#fff" height="55" rx="12" stroke="#167465" stroke-width="2" width="160" x="450" y="47"></rect><text fill="#167465" font-size="23" font-weight="700" text-anchor="middle" x="530.0" y="82.5">Σ = 0.5</text><text fill="#74867d" font-size="19" font-weight="500" text-anchor="middle" x="65" y="170">Turn 2</text><rect fill="#167465" height="35" rx="3" stroke="#167465" stroke-width="2" width="45" x="135" y="150"></rect><text fill="white" font-size="15" font-weight="500" text-anchor="middle" x="157" y="174">0.2</text><rect fill="#167465" height="35" rx="3" stroke="#167465" stroke-width="2" width="45" x="193" y="150"></rect><text fill="white" font-size="15" font-weight="500" text-anchor="middle" x="215" y="174">0.4</text><rect fill="#167465" height="35" rx="3" stroke="#167465" stroke-width="2" width="45" x="251" y="150"></rect><text fill="white" font-size="15" font-weight="500" text-anchor="middle" x="273" y="174">0.1</text><rect fill="#167465" height="35" rx="3" stroke="#167465" stroke-width="2" width="45" x="309" y="150"></rect><text fill="white" font-size="15" font-weight="500" text-anchor="middle" x="331" y="174">0.1</text><path d="M375,168 L435,168" fill="none" marker-end="url(#s34arrow167465)" stroke="#167465" stroke-width="3"></path><rect fill="#fff" height="55" rx="12" stroke="#167465" stroke-width="2" width="160" x="450" y="142"></rect><text fill="#167465" font-size="23" font-weight="700" text-anchor="middle" x="530.0" y="177.5">Σ = 0.8</text><text fill="#74867d" font-size="19" font-weight="500" text-anchor="middle" x="65" y="265">Turn 3</text><rect fill="#bc6252" height="35" rx="3" stroke="#bc6252" stroke-width="2" width="45" x="135" y="245"></rect><text fill="white" font-size="15" font-weight="500" text-anchor="middle" x="157" y="269">-0.2</text><rect fill="#167465" height="35" rx="3" stroke="#167465" stroke-width="2" width="45" x="193" y="245"></rect><text fill="white" font-size="15" font-weight="500" text-anchor="middle" x="215" y="269">0.1</text><rect fill="#167465" height="35" rx="3" stroke="#167465" stroke-width="2" width="45" x="251" y="245"></rect><text fill="white" font-size="15" font-weight="500" text-anchor="middle" x="273" y="269">0.1</text><rect fill="#167465" height="35" rx="3" stroke="#167465" stroke-width="2" width="45" x="309" y="245"></rect><text fill="white" font-size="15" font-weight="500" text-anchor="middle" x="331" y="269">0.0</text><path d="M375,263 L435,263" fill="none" marker-end="url(#s34arrow167465)" stroke="#167465" stroke-width="3"></path><rect fill="#fff" height="55" rx="12" stroke="#167465" stroke-width="2" width="160" x="450" y="237"></rect><text fill="#167465" font-size="23" font-weight="700" text-anchor="middle" x="530.0" y="272.5">Σ = 0.0</text><text fill="#193e37" font-size="20" font-weight="500" text-anchor="middle" x="330" y="375">token 隐式奖励 → turn 汇总 → 可选结果奖励分配</text></svg></div></div><div class="take">后一式是 Norm-ITPO 的可选分配方式；R=0 时这份乘法分配也为 0。</div></div><div class="block-bottom"><div class="sources"><a href="https://arxiv.org/html/2603.23550v1" rel="noopener" target="_blank">ITPO ↗</a></div></div><details class="speaker"><summary>补充说明与适用边界</summary><p>与iStar共享隐式奖励思路，但ITPO使用整体结果监督训练隐式PRM，并重点处理轮次尺度。论文策略优化也采用turn-level ratio。图中数值是教学聚合例子。</p></details>
+</section>
+<section>
+  <h2>下一步核对</h2>
+  <p>轮次长度变化会不会影响奖励和信用分配？终局奖励为零时会怎样？</p>
+  <p class="verification"><strong>原文核对</strong> · <a href="https://arxiv.org/html/2603.23550v1">打开原论文</a><br>隐式过程奖励的 turn 聚合和可选归一化。表中 token 分数是教学构造。 其余教学例子和延伸推断由笔记整理。</p>
+</section>
+<section class="related">
+  <h2>相关笔记</h2>
+  <ul><li><a href="/notes/credit-assignment-map/">长程信用分配：从五类证据找到局部学习信号</a></li></ul>
+</section>
+
+      </article>
+    </main>
+    <footer class="article-footer">Research Notes · <a href="/rss.xml">RSS 订阅</a></footer>
+  </div>
+</body>
+</html>

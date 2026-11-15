@@ -1,0 +1,284 @@
+[
+  {
+    "source_block": 1,
+    "section": "一次交互中的两个学习问题",
+    "slug": "off-policy-reliability",
+    "anchor": "block-01"
+  },
+  {
+    "source_block": 2,
+    "section": "用同一个前缀拆开两种概率差异",
+    "slug": "off-policy-reliability",
+    "anchor": "block-02"
+  },
+  {
+    "source_block": 3,
+    "section": "GSPO：把裁剪单位变成整个回答",
+    "slug": "gspo",
+    "anchor": "block-03"
+  },
+  {
+    "source_block": 4,
+    "section": "R3：训练时沿着 rollout 的专家路径",
+    "slug": "r3",
+    "anchor": "block-04"
+  },
+  {
+    "source_block": 5,
+    "section": "IcePop：失配太大的 token 暂不参与该项更新",
+    "slug": "icepop",
+    "anchor": "block-05"
+  },
+  {
+    "source_block": 6,
+    "section": "不同方法改变的更新环节",
+    "slug": "off-policy-reliability",
+    "anchor": "block-06"
+  },
+  {
+    "source_block": 7,
+    "section": "从最大化 return 出发，推到策略梯度",
+    "slug": "score-centering",
+    "anchor": "block-07"
+  },
+  {
+    "source_block": 8,
+    "section": "把其中一项叫做 score：它的均值恰好为零",
+    "slug": "score-centering",
+    "anchor": "block-08"
+  },
+  {
+    "source_block": 9,
+    "section": "把 E[R s] 展开，理想更新只剩协方差",
+    "slug": "score-centering",
+    "anchor": "block-09"
+  },
+  {
+    "source_block": 10,
+    "section": "实际样本来自 q：两项都可能出问题",
+    "slug": "score-centering",
+    "anchor": "block-10"
+  },
+  {
+    "source_block": 11,
+    "section": "drift 的方向，其实是拟合 sampler 的交叉熵方向",
+    "slug": "score-centering",
+    "anchor": "block-11"
+  },
+  {
+    "source_block": 12,
+    "section": "teacher 也在移动：追上一次偏差，下一轮又出现",
+    "slug": "score-centering",
+    "anchor": "block-12"
+  },
+  {
+    "source_block": 13,
+    "section": "Score Centering：直接消掉平均 score",
+    "slug": "score-centering",
+    "anchor": "block-13"
+  },
+  {
+    "source_block": 14,
+    "section": "怎样算平均 score？先用 top-k 重建 sampler 分布",
+    "slug": "score-centering",
+    "anchor": "block-14"
+  },
+  {
+    "source_block": 15,
+    "section": "再次利用零均值性质，把 tail 求和消掉",
+    "slug": "score-centering",
+    "anchor": "block-15"
+  },
+  {
+    "source_block": 16,
+    "section": "SC 之后还不够：Cov 的分布仍然是 q",
+    "slug": "score-centering",
+    "anchor": "block-16"
+  },
+  {
+    "source_block": 17,
+    "section": "用 IS 校正分布，再用 TIS / MIS 控制极端权重",
+    "slug": "score-centering",
+    "anchor": "block-17"
+  },
+  {
+    "source_block": 18,
+    "section": "量化与 Staleness，要分开看",
+    "slug": "score-centering",
+    "anchor": "block-18"
+  },
+  {
+    "source_block": 19,
+    "section": "M2PO：让极端 log-ratio 对应项退出更新",
+    "slug": "m2po",
+    "anchor": "block-19"
+  },
+  {
+    "source_block": 20,
+    "section": "VCPO：按有效样本量调整更新强度",
+    "slug": "vcpo",
+    "anchor": "block-20"
+  },
+  {
+    "source_block": 21,
+    "section": "局部 advantage 的五个入口",
+    "slug": "credit-assignment-map",
+    "anchor": "block-21"
+  },
+  {
+    "source_block": 22,
+    "section": "成功的轨迹有绕路，失败的轨迹有好动作",
+    "slug": "graphgpo",
+    "anchor": "block-22"
+  },
+  {
+    "source_block": 23,
+    "section": "step advantage 到底怎么算？",
+    "slug": "gigpo",
+    "anchor": "block-23"
+  },
+  {
+    "source_block": 24,
+    "section": "GiGPO：在同一状态下比较不同尝试",
+    "slug": "gigpo",
+    "anchor": "block-24"
+  },
+  {
+    "source_block": 25,
+    "section": "同状态比较，仍可能把后续失败算到前面",
+    "slug": "gigpo",
+    "anchor": "block-25"
+  },
+  {
+    "source_block": 26,
+    "section": "失败前缀，可以接上另一条轨迹的成功后缀",
+    "slug": "graphgpo",
+    "anchor": "block-26"
+  },
+  {
+    "source_block": 27,
+    "section": "图上的成功距离，提供另一种信用证据",
+    "slug": "graphgpo",
+    "anchor": "block-27"
+  },
+  {
+    "source_block": 28,
+    "section": "重复状态是证据，也是一项假设",
+    "slug": "graphgpo",
+    "anchor": "block-28"
+  },
+  {
+    "source_block": 29,
+    "section": "同文比较，三个环境均有提升",
+    "slug": "graphgpo",
+    "anchor": "block-29"
+  },
+  {
+    "source_block": 30,
+    "section": "先检查证据覆盖，再期待训练收益",
+    "slug": "graphgpo",
+    "anchor": "block-30"
+  },
+  {
+    "source_block": 31,
+    "section": "SWEET-RL：让 Critic 看见训练时参考信息",
+    "slug": "sweet-rl",
+    "anchor": "block-31"
+  },
+  {
+    "source_block": 32,
+    "section": "HCAPO：用事后条件化评分，重加权回报",
+    "slug": "hcapo",
+    "anchor": "block-32"
+  },
+  {
+    "source_block": 33,
+    "section": "IGPO：正确答案更容易预测，作为进展信号",
+    "slug": "igpo",
+    "anchor": "block-33"
+  },
+  {
+    "source_block": 34,
+    "section": "TRACE：衡量答案预测缺口的相对缩小",
+    "slug": "trace",
+    "anchor": "block-34"
+  },
+  {
+    "source_block": 35,
+    "section": "iStar：整体偏好，也可以训练局部奖励",
+    "slug": "istar",
+    "anchor": "block-35"
+  },
+  {
+    "source_block": 36,
+    "section": "ITPO：把 token 的隐式信号聚合到完整一轮",
+    "slug": "itpo",
+    "anchor": "block-36"
+  },
+  {
+    "source_block": 37,
+    "section": "ArCHer：把完整语言行动作为高层动作",
+    "slug": "archer",
+    "anchor": "block-37"
+  },
+  {
+    "source_block": 38,
+    "section": "HiPER：规划、切换与执行，各有优势信号",
+    "slug": "hiper",
+    "anchor": "block-38"
+  },
+  {
+    "source_block": 39,
+    "section": "从训练现象到可检验的诊断",
+    "slug": "agent-training-diagnostics",
+    "anchor": "block-39"
+  },
+  {
+    "source_block": 40,
+    "section": "同一个公式，先说明在哪个随机变量层级上",
+    "slug": "score-centering",
+    "anchor": "block-40"
+  },
+  {
+    "source_block": 41,
+    "section": "先近似尾部，再精确化简",
+    "slug": "score-centering",
+    "anchor": "block-41"
+  },
+  {
+    "source_block": 42,
+    "section": "看权重，也看梯度何时为零",
+    "slug": "score-centering",
+    "anchor": "block-42"
+  },
+  {
+    "source_block": 43,
+    "section": "GRPO 的组内中心化，为什么仍不够？",
+    "slug": "score-centering",
+    "anchor": "block-43"
+  },
+  {
+    "source_block": 44,
+    "section": "更强量化下，SC 的优势变得明显",
+    "slug": "score-centering",
+    "anchor": "block-44"
+  },
+  {
+    "source_block": 45,
+    "section": "局部正优势，不保证最终优势为正",
+    "slug": "graphgpo",
+    "anchor": "block-45"
+  },
+  {
+    "source_block": 46,
+    "section": "相似机制，可以交叉，不必强造继承",
+    "slug": "credit-assignment-map",
+    "anchor": "block-46"
+  },
+  {
+    "source_block": 47,
+    "section": "原始论文索引",
+    "slug": "agent-training-diagnostics",
+    "anchor": "block-47"
+  }
+]

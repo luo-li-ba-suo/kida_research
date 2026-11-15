@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HiPER：区分规划、切换和执行的优势信号 · Research Notes</title>
+  <meta name="description" content="在同一个自回归模型中组织 switch、subgoal、action，并分别评价不同决策层。">
+  <meta name="note:title" content="HiPER：区分规划、切换和执行的优势信号">
+  <meta name="note:slug" content="hiper">
+  <meta name="note:summary" content="在同一个自回归模型中组织 switch、subgoal、action，并分别评价不同决策层。">
+  <meta name="note:directions" content="agentic-rl">
+  <meta name="note:tags" content="信用分配, 层级强化学习">
+  <meta name="note:kind" content="paper">
+  <meta name="note:created" content="2026-11-15">
+  <meta name="note:updated" content="2026-11-15">
+  <meta name="note:status" content="published">
+  <style>
+/* Simple reading flow, independent of the old presentation's slide layout. */
+html{background:#fbfaf6;color:#263b38}body{margin:0;font:17px/1.95 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}*{box-sizing:border-box}a{color:#2e6258;text-underline-offset:4px}a:focus-visible,summary:focus-visible{outline:2px solid #2e6258;outline-offset:4px}.article-shell{max-width:870px;margin:auto;padding:0 40px}.article-nav{padding:24px 0;border-bottom:1px solid #dedfd7;display:flex;justify-content:space-between;font-size:13px}.article-nav a{text-decoration:none}.article-header{padding:48px 0 28px;border-bottom:1px solid #dedfd7;margin-bottom:30px}.eyebrow{font:11px/1.5 sans-serif;letter-spacing:.15em;color:#737e78}.article-header h1{font:500 34px/1.65 Georgia,"Songti SC",STSong,serif;letter-spacing:-.025em;margin:18px 0}.article-summary{color:#65716c;font-size:17px}.article-meta{font-size:12px;color:#737e78;display:flex;gap:14px;flex-wrap:wrap}.tags{font-size:12px;color:#2e6258;margin-top:12px}h2{font-size:24px;font-weight:500;line-height:1.6;margin:44px 0 18px}h3{font-size:20px;font-weight:500;margin:30px 0 16px}p{margin:0 0 20px}ul,ol{padding-left:26px}li{margin:8px 0}.reading-toc{padding:18px 24px;border:1px solid #dedfd7;font-size:14px;margin:28px 0}.reading-toc ol{margin-bottom:0}.reading-toc a{text-decoration:none}.reading-toc summary{cursor:pointer}.reading-section{margin:0 0 42px}.reading-section>h2{border-bottom:1px solid #dedfd7;padding-bottom:12px}.block-sub{font-size:16px;color:#65716c}.content,.split,.copy,.explain-grid,.explain-grid>div{display:block;width:100%}.problem-box{padding:16px 20px;margin:18px 0;background:#eef1e9;border-left:3px solid #8b9f88}.problem-box b{display:block;font-size:13px;color:#61765d;margin-bottom:5px}.problem-box span{display:block}.reason b{display:block;margin-bottom:6px}.math,.math-block{overflow-x:auto;padding:14px 0;margin:18px 0;font-size:.95em}.math-inline{font-size:.95em}.katex-display{margin:.5em 0}figure{margin:28px 0}img{max-width:100%;height:auto;display:block}svg{display:block;width:100%;height:auto;margin:24px auto}figcaption,.caption{font-size:13px;color:#737e78;line-height:1.7;margin-top:12px}.speaker,.supplement{padding:15px 20px;border:1px solid #dedfd7;margin:20px 0;font-size:14px}.speaker summary,.supplement summary{cursor:pointer;color:#65716c}.speaker p{margin:14px 0 0}.block-bottom{font-size:12px;margin:12px 0}.sources{display:flex;gap:14px;flex-wrap:wrap}table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto;margin:24px 0}td,th{padding:10px;border-bottom:1px solid #dedfd7;text-align:left}th{background:#eef1e9}pre{overflow:auto;background:#f0f1eb;padding:18px;font-size:13px}code{font-family:ui-monospace,SFMono-Regular,monospace}blockquote{border-left:3px solid #9aab91;padding:4px 20px;color:#65716c;margin:24px 0}.editorial{border-left:3px solid #a2b49b;padding:5px 20px;margin:28px 0}.editorial h2{font-size:17px;margin:0 0 10px}.verification{font-size:13px;color:#69736c;padding:16px 20px;background:#eef1e9;margin:24px 0}.article-footer{border-top:1px solid #dedfd7;margin-top:44px;padding:24px 0 40px;font-size:12px;color:#737e78}.related{padding:20px 0}.related ul{font-size:15px}.draft-banner{background:#f4e6c9;color:#7e5b20;padding:12px 20px;font-size:13px}.math-error{color:#a43d2b;background:#fff1e9;font-family:monospace}.figure-wrap{overflow:auto}a[href^="#"]{scroll-margin-top:20px}.reading-section{scroll-margin-top:20px}.paper-note{font-size:13px;color:#737e78}.source-label{font-size:12px;color:#737e78}
+@media(max-width:640px){body{font-size:16px}.article-shell{padding:0 22px}.article-header{padding-top:30px}.article-header h1{font-size:27px}h2{font-size:22px}.reading-toc{padding:15px}.article-nav{gap:20px}.math-block{font-size:.85em}.speaker{padding:12px}.article-meta{gap:8px 15px}}
+@media print{.article-nav,.reading-toc{display:none}body{font-size:11pt;background:white}.article-shell{max-width:none;padding:0}details> *{display:block}.reading-section{break-inside:auto}a{color:inherit}.article-header{padding-top:0}}
+
+.math-block math{min-width:max-content;margin:auto}
+.reference-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.take{border-left:2px solid #a2b49b;padding:8px 14px;margin:14px 0}
+.reading-section svg{background:#fff;border:1px solid #e3e5dc}
+
+  </style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const meta=name=>document.querySelector(`meta[name="note:${name}"]`)?.content||'';
+  document.querySelectorAll('[data-note-field]').forEach(el=>{const value=meta(el.dataset.noteField);
+    el.textContent=value;
+    if(el.tagName==='TIME')el.dateTime=value;});
+  if(meta('status')!=='published'){const banner=document.createElement('div');banner.className='draft-banner';banner.textContent='私人草稿 · 此状态不会进入公开网站';document.body.prepend(banner);}
+  document.title=meta('title')+' · Research Notes';
+  const description=document.querySelector('meta[name=description]');
+  if(description)description.content=meta('summary');
+  document.querySelectorAll('.math-block,.math-inline').forEach(el=>{
+    if(el.querySelector('math'))return;
+    const tex=el.textContent;el.dataset.latex=tex;
+    try{katex.render(tex,el,{displayMode:el.classList.contains('math-block'),throwOnError:true,trust:false,strict:'warn'});}
+    catch(error){el.textContent=tex;el.classList.add('math-error');el.title=error.message;}
+  });
+});
+
+</script>
+</head>
+<body>
+  <div class="article-shell">
+    <nav class="article-nav" aria-label="文章导航">
+      <a href="/">Kida / Research Notes</a>
+      <a href="/archive/">全部文章 →</a>
+    </nav>
+    <main>
+      <article>
+        <header class="article-header">
+          <p class="eyebrow">论文精读 · RESEARCH NOTES</p>
+          <h1 data-note-field="title">HiPER：区分规划、切换和执行的优势信号</h1>
+          <p class="article-summary" data-note-field="summary">在同一个自回归模型中组织 switch、subgoal、action，并分别评价不同决策层。</p>
+          <div class="article-meta">
+            <span>首次发布 <time data-note-field="created" datetime="2026-11-15">2026-11-15</time></span>
+            <span>最近更新 <time data-note-field="updated" datetime="2026-11-15">2026-11-15</time></span>
+          </div>
+          <div class="tags">Agentic RL</div>
+        </header>
+
+<aside class="editorial">
+  <h2>阅读理解</h2>
+  <p>分层表示使错误来源更容易区分，但还需要实验证明对应价值信号确实有用。</p>
+</aside>
+
+<section class="reading-section" id="block-38">
+<h2>HiPER：规划、切换与执行，各有优势信号</h2>
+<p class="block-sub">失败究竟是目标选错了、切换太早，还是动作没执行好？</p><div class="content"><div class="problem-box"><b>遇到的问题</b><span>同一个终局奖励会把规划与执行混在一起：合理子目标也可能因执行失误失败，正确动作也可能服务于错误目标。</span></div><div class="split"><div class="copy"><p class="reason"><b>怎么改</b>单个 LLM 生成切换、子目标与动作，分别使用 switch、high、low 三类优势信号。</p><p class="reason"><b>为何有效</b>把“是否换目标”“选哪个目标”“怎样执行”分开评价，让长期回报作用到对应的决策层。</p><p class="reason"><b>例子</b>“前往厨房”目标合理，不代表应奖励所有走动；无效转向应在执行层区分。</p></div><div class="visual"><svg role="img" viewbox="0 0 660 420" xmlns="http://www.w3.org/2000/svg"><defs><marker id="s36arrow167465" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#167465"></path></marker><marker id="s36arrow193e37" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#193e37"></path></marker><marker id="s36arrow74867d" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#74867d"></path></marker><marker id="s36arrowb77a36" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#b77a36"></path></marker><marker id="s36arrowbc6252" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#bc6252"></path></marker><marker id="s36arrow537b9e" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#537b9e"></path></marker><marker id="s36arrowd7e3db" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#d7e3db"></path></marker></defs><rect fill="#fff" height="80" rx="12" stroke="#b77a36" stroke-width="2" width="180" x="25" y="30"></rect><text fill="#b77a36" font-size="23" font-weight="700" text-anchor="middle" x="115.0" y="70.0">保持 / 切换</text><text fill="#74867d" font-size="16" font-weight="500" text-anchor="middle" x="115.0" y="100.0">switch advantage</text><path d="M215,70 L245,70" fill="none" marker-end="url(#s36arrowb77a36)" stroke="#b77a36" stroke-width="3"></path><rect fill="#fff" height="80" rx="12" stroke="#537b9e" stroke-width="2" width="180" x="255" y="30"></rect><text fill="#537b9e" font-size="23" font-weight="700" text-anchor="middle" x="345.0" y="70.0">选择子目标</text><text fill="#74867d" font-size="16" font-weight="500" text-anchor="middle" x="345.0" y="100.0">high advantage</text><path d="M445,70 L475,70" fill="none" marker-end="url(#s36arrow537b9e)" stroke="#537b9e" stroke-width="3"></path><rect fill="#fff" height="80" rx="12" stroke="#167465" stroke-width="2" width="150" x="485" y="30"></rect><text fill="#167465" font-size="23" font-weight="700" text-anchor="middle" x="560.0" y="70.0">具体动作</text><text fill="#74867d" font-size="16" font-weight="500" text-anchor="middle" x="560.0" y="100.0">low advantage</text><rect fill="#fff" height="70" rx="12" stroke="#537b9e" stroke-width="2" width="285" x="30" y="180"></rect><text fill="#537b9e" font-size="23" font-weight="700" text-anchor="middle" x="172.5" y="223.0">子目标：前往厨房</text><rect fill="#fff" height="70" rx="12" stroke="#537b9e" stroke-width="2" width="285" x="350" y="180"></rect><text fill="#537b9e" font-size="23" font-weight="700" text-anchor="middle" x="492.5" y="223.0">子目标：取出物品</text><rect fill="#fff" height="55" rx="12" stroke="#167465" stroke-width="2" width="85" x="40" y="300"></rect><text fill="#167465" font-size="23" font-weight="700" text-anchor="middle" x="82.5" y="335.5">走动</text><rect fill="#fff" height="55" rx="12" stroke="#167465" stroke-width="2" width="85" x="140" y="300"></rect><text fill="#167465" font-size="23" font-weight="700" text-anchor="middle" x="182.5" y="335.5">转向</text><rect fill="#fff" height="55" rx="12" stroke="#167465" stroke-width="2" width="85" x="240" y="300"></rect><text fill="#167465" font-size="23" font-weight="700" text-anchor="middle" x="282.5" y="335.5">进门</text><rect fill="#fff" height="55" rx="12" stroke="#167465" stroke-width="2" width="85" x="360" y="300"></rect><text fill="#167465" font-size="23" font-weight="700" text-anchor="middle" x="402.5" y="335.5">开柜</text><rect fill="#fff" height="55" rx="12" stroke="#167465" stroke-width="2" width="85" x="465" y="300"></rect><text fill="#167465" font-size="23" font-weight="700" text-anchor="middle" x="507.5" y="335.5">拾取</text><rect fill="#fff" height="55" rx="12" stroke="#167465" stroke-width="2" width="85" x="565" y="300"></rect><text fill="#167465" font-size="23" font-weight="700" text-anchor="middle" x="607.5" y="335.5">确认</text><path d="M175,255 L175,290" fill="none" marker-end="url(#s36arrow537b9e)" stroke="#537b9e" stroke-width="3"></path><path d="M490,255 L490,290" fill="none" marker-end="url(#s36arrow537b9e)" stroke="#537b9e" stroke-width="3"></path><text fill="#74867d" font-size="20" font-weight="500" text-anchor="middle" x="330" y="405">单个 LLM 顺序生成切换、子目标与动作</text></svg></div></div><div class="take">层级结构提供了区分入口，仍需要可靠的价值估计与子目标边界。</div></div><div class="block-bottom"><div class="sources"><a href="https://arxiv.org/html/2602.16165v1" rel="noopener" target="_blank">HiPER ↗</a></div></div><details class="speaker"><summary>补充说明与适用边界</summary><p>不画成两个独立LLM，原论文由同一个自回归LLM顺序生成switch/subgoal/action字段。优势来自层级actor-critic，规划格式本身不等于解决信用分配。</p></details>
+</section>
+<section>
+  <h2>下一步核对</h2>
+  <p>子目标边界与价值估计是否可靠？失败主要发生在哪一层？</p>
+  <p class="verification"><strong>原文核对</strong> · <a href="https://arxiv.org/html/2602.16165v1">打开原论文</a><br>单一自回归 LLM 的层级生成与 HAE 的 switch、high、low 估计。 其余教学例子和延伸推断由笔记整理。</p>
+</section>
+<section class="related">
+  <h2>相关笔记</h2>
+  <ul><li><a href="/notes/credit-assignment-map/">长程信用分配：从五类证据找到局部学习信号</a></li></ul>
+</section>
+
+      </article>
+    </main>
+    <footer class="article-footer">Research Notes · <a href="/rss.xml">RSS 订阅</a></footer>
+  </div>
+</body>
+</html>

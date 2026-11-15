@@ -1,0 +1,14 @@
+---
+layout: page
+title: 全部文章
+permalink: /archive/
+---
+<div class="page-heading"><p class="eyebrow">THE ARCHIVE</p><h1>全部文章</h1><p>每一次更新，都让已有的理解更清楚一点。</p></div>
+<form class="filters" role="search" onsubmit="return false">
+<label>搜索标题与摘要<input id="search" type="search" placeholder="例如：信用分配、Score Centering" autocomplete="off"></label>
+<label>研究方向<select id="direction"><option value="">全部方向</option><option value="agentic-rl">Agentic RL</option><option value="reward-modeling">Reward Modeling</option><option value="social-intelligence">Social Intelligence</option></select></label>
+<label>标签<select id="tag"><option value="">全部标签</option></select></label>
+</form>
+<p class="muted" id="result-count" aria-live="polite">共 {{ site.data.notes.size }} 篇文章</p>
+<div id="search-results">{% include note-list.html notes=site.data.notes %}</div>
+<script src="/assets/search.js" defer></script>

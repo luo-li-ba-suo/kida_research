@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IcePop：单独处理训练与推理的概率失配 · Research Notes</title>
+  <meta name="description" content="区分新旧策略比值与训推校正比值，理解概率校正和极端失配掩码的分工。">
+  <meta name="note:title" content="IcePop：单独处理训练与推理的概率失配">
+  <meta name="note:slug" content="icepop">
+  <meta name="note:summary" content="区分新旧策略比值与训推校正比值，理解概率校正和极端失配掩码的分工。">
+  <meta name="note:directions" content="agentic-rl">
+  <meta name="note:tags" content="训推失配, 重要性采样">
+  <meta name="note:kind" content="paper">
+  <meta name="note:created" content="2026-11-15">
+  <meta name="note:updated" content="2026-11-15">
+  <meta name="note:status" content="published">
+  <style>
+/* Simple reading flow, independent of the old presentation's slide layout. */
+html{background:#fbfaf6;color:#263b38}body{margin:0;font:17px/1.95 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}*{box-sizing:border-box}a{color:#2e6258;text-underline-offset:4px}a:focus-visible,summary:focus-visible{outline:2px solid #2e6258;outline-offset:4px}.article-shell{max-width:870px;margin:auto;padding:0 40px}.article-nav{padding:24px 0;border-bottom:1px solid #dedfd7;display:flex;justify-content:space-between;font-size:13px}.article-nav a{text-decoration:none}.article-header{padding:48px 0 28px;border-bottom:1px solid #dedfd7;margin-bottom:30px}.eyebrow{font:11px/1.5 sans-serif;letter-spacing:.15em;color:#737e78}.article-header h1{font:500 34px/1.65 Georgia,"Songti SC",STSong,serif;letter-spacing:-.025em;margin:18px 0}.article-summary{color:#65716c;font-size:17px}.article-meta{font-size:12px;color:#737e78;display:flex;gap:14px;flex-wrap:wrap}.tags{font-size:12px;color:#2e6258;margin-top:12px}h2{font-size:24px;font-weight:500;line-height:1.6;margin:44px 0 18px}h3{font-size:20px;font-weight:500;margin:30px 0 16px}p{margin:0 0 20px}ul,ol{padding-left:26px}li{margin:8px 0}.reading-toc{padding:18px 24px;border:1px solid #dedfd7;font-size:14px;margin:28px 0}.reading-toc ol{margin-bottom:0}.reading-toc a{text-decoration:none}.reading-toc summary{cursor:pointer}.reading-section{margin:0 0 42px}.reading-section>h2{border-bottom:1px solid #dedfd7;padding-bottom:12px}.block-sub{font-size:16px;color:#65716c}.content,.split,.copy,.explain-grid,.explain-grid>div{display:block;width:100%}.problem-box{padding:16px 20px;margin:18px 0;background:#eef1e9;border-left:3px solid #8b9f88}.problem-box b{display:block;font-size:13px;color:#61765d;margin-bottom:5px}.problem-box span{display:block}.reason b{display:block;margin-bottom:6px}.math,.math-block{overflow-x:auto;padding:14px 0;margin:18px 0;font-size:.95em}.math-inline{font-size:.95em}.katex-display{margin:.5em 0}figure{margin:28px 0}img{max-width:100%;height:auto;display:block}svg{display:block;width:100%;height:auto;margin:24px auto}figcaption,.caption{font-size:13px;color:#737e78;line-height:1.7;margin-top:12px}.speaker,.supplement{padding:15px 20px;border:1px solid #dedfd7;margin:20px 0;font-size:14px}.speaker summary,.supplement summary{cursor:pointer;color:#65716c}.speaker p{margin:14px 0 0}.block-bottom{font-size:12px;margin:12px 0}.sources{display:flex;gap:14px;flex-wrap:wrap}table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto;margin:24px 0}td,th{padding:10px;border-bottom:1px solid #dedfd7;text-align:left}th{background:#eef1e9}pre{overflow:auto;background:#f0f1eb;padding:18px;font-size:13px}code{font-family:ui-monospace,SFMono-Regular,monospace}blockquote{border-left:3px solid #9aab91;padding:4px 20px;color:#65716c;margin:24px 0}.editorial{border-left:3px solid #a2b49b;padding:5px 20px;margin:28px 0}.editorial h2{font-size:17px;margin:0 0 10px}.verification{font-size:13px;color:#69736c;padding:16px 20px;background:#eef1e9;margin:24px 0}.article-footer{border-top:1px solid #dedfd7;margin-top:44px;padding:24px 0 40px;font-size:12px;color:#737e78}.related{padding:20px 0}.related ul{font-size:15px}.draft-banner{background:#f4e6c9;color:#7e5b20;padding:12px 20px;font-size:13px}.math-error{color:#a43d2b;background:#fff1e9;font-family:monospace}.figure-wrap{overflow:auto}a[href^="#"]{scroll-margin-top:20px}.reading-section{scroll-margin-top:20px}.paper-note{font-size:13px;color:#737e78}.source-label{font-size:12px;color:#737e78}
+@media(max-width:640px){body{font-size:16px}.article-shell{padding:0 22px}.article-header{padding-top:30px}.article-header h1{font-size:27px}h2{font-size:22px}.reading-toc{padding:15px}.article-nav{gap:20px}.math-block{font-size:.85em}.speaker{padding:12px}.article-meta{gap:8px 15px}}
+@media print{.article-nav,.reading-toc{display:none}body{font-size:11pt;background:white}.article-shell{max-width:none;padding:0}details> *{display:block}.reading-section{break-inside:auto}a{color:inherit}.article-header{padding-top:0}}
+
+.math-block math{min-width:max-content;margin:auto}
+.reference-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.take{border-left:2px solid #a2b49b;padding:8px 14px;margin:14px 0}
+.reading-section svg{background:#fff;border:1px solid #e3e5dc}
+
+  </style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const meta=name=>document.querySelector(`meta[name="note:${name}"]`)?.content||'';
+  document.querySelectorAll('[data-note-field]').forEach(el=>{const value=meta(el.dataset.noteField);
+    el.textContent=value;
+    if(el.tagName==='TIME')el.dateTime=value;});
+  if(meta('status')!=='published'){const banner=document.createElement('div');banner.className='draft-banner';banner.textContent='私人草稿 · 此状态不会进入公开网站';document.body.prepend(banner);}
+  document.title=meta('title')+' · Research Notes';
+  const description=document.querySelector('meta[name=description]');
+  if(description)description.content=meta('summary');
+  document.querySelectorAll('.math-block,.math-inline').forEach(el=>{
+    if(el.querySelector('math'))return;
+    const tex=el.textContent;el.dataset.latex=tex;
+    try{katex.render(tex,el,{displayMode:el.classList.contains('math-block'),throwOnError:true,trust:false,strict:'warn'});}
+    catch(error){el.textContent=tex;el.classList.add('math-error');el.title=error.message;}
+  });
+});
+
+</script>
+</head>
+<body>
+  <div class="article-shell">
+    <nav class="article-nav" aria-label="文章导航">
+      <a href="/">Kida / Research Notes</a>
+      <a href="/archive/">全部文章 →</a>
+    </nav>
+    <main>
+      <article>
+        <header class="article-header">
+          <p class="eyebrow">论文精读 · RESEARCH NOTES</p>
+          <h1 data-note-field="title">IcePop：单独处理训练与推理的概率失配</h1>
+          <p class="article-summary" data-note-field="summary">区分新旧策略比值与训推校正比值，理解概率校正和极端失配掩码的分工。</p>
+          <div class="article-meta">
+            <span>首次发布 <time data-note-field="created" datetime="2026-11-15">2026-11-15</time></span>
+            <span>最近更新 <time data-note-field="updated" datetime="2026-11-15">2026-11-15</time></span>
+          </div>
+          <div class="tags">Agentic RL</div>
+        </header>
+
+<aside class="editorial">
+  <h2>阅读理解</h2>
+  <p>检查 PPO ratio 接近 1 还不够；同版权重的训练和推理引擎也可能给出明显不同的概率。</p>
+</aside>
+
+<section class="reading-section" id="block-05">
+<h2>IcePop：失配太大的 token 暂不参与该项更新</h2>
+<p class="block-sub">PPO 的新旧策略 ratio≈1，也可能藏着很大的训推差异</p><div class="content"><div class="problem-box"><b>遇到的问题</b><span>同版权重下，推理给某 token 概率 0.02，训练却给 0.08。此时训练新旧 ratio 可等于 1，仍有 4 倍训推失配；只检查前者看不到它。</span></div><div class="split"><div class="copy"><div class="math"><span class="math-block"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>κ</mi><mi>t</mi></msub><mo>=</mo><mfrac><mrow><msub><mi>π</mi><mrow><mrow><mi mathvariant="normal">t</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">n</mi></mrow><mo separator="true">,</mo><mi>ϕ</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>y</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>h</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow><mrow><msub><mi>π</mi><mrow><mrow><mi mathvariant="normal">i</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">f</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">r</mi></mrow><mo separator="true">,</mo><mi>ϕ</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>y</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>h</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">\kappa_t=\frac{\pi_{\mathrm{train},\phi}(y_t\mid h_t)}{\pi_{\mathrm{infer},\phi}(y_t\mid h_t)}</annotation></semantics></math></span></div><p class="reason"><b>怎么改</b>单独计算 κ：区间内用 κ 校正，区间外屏蔽对应项；再与原来的 PPO surrogate 配合。</p><div class="math"><span class="math-block"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mi>t</mi></msub><mo>=</mo><msub><mi>κ</mi><mi>t</mi></msub><mtext> </mtext><mn mathvariant="bold">1</mn><mo stretchy="false">[</mo><mi>α</mi><mo>≤</mo><msub><mi>κ</mi><mi>t</mi></msub><mo>≤</mo><mi>β</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">w_t=\kappa_t\,\mathbf1[\alpha\le\kappa_t\le\beta]</annotation></semantics></math></span></div><p class="reason"><b>为何有效</b>补上采样引擎与训练引擎之间的校正，并限制极端失配项继续影响更新。</p></div><div class="visual"><svg role="img" viewbox="0 0 660 420" xmlns="http://www.w3.org/2000/svg"><defs><marker id="s4arrow167465" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#167465"></path></marker><marker id="s4arrow193e37" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#193e37"></path></marker><marker id="s4arrow74867d" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#74867d"></path></marker><marker id="s4arrowb77a36" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#b77a36"></path></marker><marker id="s4arrowbc6252" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#bc6252"></path></marker><marker id="s4arrow537b9e" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#537b9e"></path></marker><marker id="s4arrowd7e3db" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#d7e3db"></path></marker></defs><text fill="#74867d" font-size="21" font-weight="500" text-anchor="middle" x="330" y="30">教学阈值 α = 0.5，β = 5</text><rect fill="#e2eee7" height="200" rx="12" stroke="#e2eee7" stroke-width="2" width="400" x="125" y="65"></rect><text fill="#167465" font-size="18" font-weight="500" text-anchor="middle" x="325" y="90">保留并用 κ 加权</text><circle cx="65" cy="175" fill="#bc6252" r="37"></circle><text fill="white" font-size="22" font-weight="700" text-anchor="middle" x="65" y="183">0.03</text><path d="M34,145 L96,205" fill="none" stroke="#bc6252" stroke-width="3"></path><circle cx="190" cy="175" fill="#167465" r="37"></circle><text fill="white" font-size="22" font-weight="700" text-anchor="middle" x="190" y="183">0.90</text><circle cx="300" cy="175" fill="#167465" r="37"></circle><text fill="white" font-size="22" font-weight="700" text-anchor="middle" x="300" y="183">1.08</text><circle cx="415" cy="175" fill="#167465" r="37"></circle><text fill="white" font-size="22" font-weight="700" text-anchor="middle" x="415" y="183">1.14</text><circle cx="590" cy="175" fill="#bc6252" r="37"></circle><text fill="white" font-size="22" font-weight="700" text-anchor="middle" x="590" y="183">7.20</text><path d="M559,145 L621,205" fill="none" stroke="#bc6252" stroke-width="3"></path><text fill="#bc6252" font-size="21" font-weight="500" text-anchor="middle" x="65" y="300">屏蔽</text><text fill="#bc6252" font-size="21" font-weight="500" text-anchor="middle" x="590" y="300">屏蔽</text><text fill="#193e37" font-size="22" font-weight="500" text-anchor="middle" x="330" y="370">同版权重：训练概率 / 实际推理概率</text></svg></div></div><div class="take">这里区分的是两个 ratio。若直接对训练／实际行为概率的总比值裁剪，则是另一种设计，不能说 PPO 永远看不到失配。</div></div><div class="block-bottom"><div class="sources"><a href="https://arxiv.org/abs/2510.18855" rel="noopener" target="_blank">IcePop ↗</a></div></div><details class="speaker"><summary>补充说明与适用边界</summary><p>0.02→0.08是教学例子：更新开始时训练新旧ratio=1，但训推κ=4。图中教学阈值[0.5,5]会保留并加权κ=4，κ=7.2才被屏蔽。原文M(κ)乘在PPO surrogate之外；这不同于直接用总ratio并统一裁剪。mask屏蔽对应项，不代表其他样本不再更新共享参数。</p></details>
+</section>
+<section>
+  <h2>下一步核对</h2>
+  <p>被掩掉的 token 占比与任务难度、训练步数之间有什么关系？</p>
+  <p class="verification"><strong>原文核对</strong> · <a href="https://arxiv.org/abs/2510.18855">打开原论文</a><br>IcePop 方法节对训推 discrepancy ratio 与 masking 的定义。0.02/0.08 是教学示例。 其余教学例子和延伸推断由笔记整理。</p>
+</section>
+<section class="related">
+  <h2>相关笔记</h2>
+  <ul><li><a href="/notes/off-policy-reliability/">Off-policy 训练的可靠性：分清两种不一致</a></li></ul>
+</section>
+
+      </article>
+    </main>
+    <footer class="article-footer">Research Notes · <a href="/rss.xml">RSS 订阅</a></footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,8 @@
+---
+layout: page
+title: Social Intelligence
+permalink: /directions/social-intelligence/
+---
+<div class="page-heading"><p class="eyebrow">RESEARCH DIRECTION</p><h1>Social Intelligence</h1><p class="lead">智能体如何理解他人，并与他人协作？</p><p>这里将记录社会推理、协作与多智能体交互的阅读笔记。</p></div>
+{% assign selected = site.data.notes | where_exp: 'note', "note.directions contains 'social-intelligence'" %}
+{% if selected.size > 0 %}{% include note-list.html notes=selected %}{% else %}<div class="empty-state"><h2>留一页给下一个问题。</h2><p>这个方向的第一篇笔记正在酝酿。已有的研究可以从<a href="/archive/">全部文章</a>继续阅读。</p></div>{% endif %}

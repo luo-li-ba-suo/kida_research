@@ -1,0 +1,8 @@
+---
+layout: page
+title: Reward Modeling
+permalink: /directions/reward-modeling/
+---
+<div class="page-heading"><p class="eyebrow">RESEARCH DIRECTION</p><h1>Reward Modeling</h1><p class="lead">怎样把好的行为，转化为好的学习信号？</p><p>关注过程奖励、偏好学习，以及局部评价的可靠性与适用条件。</p></div>
+{% assign selected = site.data.notes | where_exp: 'note', "note.directions contains 'reward-modeling'" %}
+{% if selected.size > 0 %}{% include note-list.html notes=selected %}{% else %}<div class="empty-state"><h2>留一页给下一个问题。</h2><p>这个方向的第一篇笔记正在酝酿。已有的研究可以从<a href="/archive/">全部文章</a>继续阅读。</p></div>{% endif %}

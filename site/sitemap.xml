@@ -1,0 +1,7 @@
+---
+layout: null
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>{{ site.url }}/</loc></url><url><loc>{{ site.url }}/archive/</loc></url><url><loc>{{ site.url }}/topics/</loc></url><url><loc>{{ site.url }}/about/</loc></url>
+{% for d in site.data.directions %}<url><loc>{{ site.url }}/directions/{{ d.slug }}/</loc></url>{% endfor %}
+{% for note in site.data.notes %}<url><loc>{{ site.url }}{{ note.url }}</loc><lastmod>{{ note.updated }}</lastmod></url>{% endfor %}</urlset>

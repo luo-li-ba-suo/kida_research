@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>长程信用分配：从五类证据找到局部学习信号 · Research Notes</title>
+  <meta name="description" content="从重复状态、评价模型、信息进展、隐式奖励与决策层级理解局部信用的来源与边界。">
+  <meta name="note:title" content="长程信用分配：从五类证据找到局部学习信号">
+  <meta name="note:slug" content="credit-assignment-map">
+  <meta name="note:summary" content="从重复状态、评价模型、信息进展、隐式奖励与决策层级理解局部信用的来源与边界。">
+  <meta name="note:directions" content="agentic-rl, reward-modeling">
+  <meta name="note:tags" content="信用分配, 过程奖励">
+  <meta name="note:kind" content="synthesis">
+  <meta name="note:created" content="2026-11-15">
+  <meta name="note:updated" content="2026-11-15">
+  <meta name="note:status" content="published">
+  <style>
+/* Simple reading flow, independent of the old presentation's slide layout. */
+html{background:#fbfaf6;color:#263b38}body{margin:0;font:17px/1.95 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}*{box-sizing:border-box}a{color:#2e6258;text-underline-offset:4px}a:focus-visible,summary:focus-visible{outline:2px solid #2e6258;outline-offset:4px}.article-shell{max-width:870px;margin:auto;padding:0 40px}.article-nav{padding:24px 0;border-bottom:1px solid #dedfd7;display:flex;justify-content:space-between;font-size:13px}.article-nav a{text-decoration:none}.article-header{padding:48px 0 28px;border-bottom:1px solid #dedfd7;margin-bottom:30px}.eyebrow{font:11px/1.5 sans-serif;letter-spacing:.15em;color:#737e78}.article-header h1{font:500 34px/1.65 Georgia,"Songti SC",STSong,serif;letter-spacing:-.025em;margin:18px 0}.article-summary{color:#65716c;font-size:17px}.article-meta{font-size:12px;color:#737e78;display:flex;gap:14px;flex-wrap:wrap}.tags{font-size:12px;color:#2e6258;margin-top:12px}h2{font-size:24px;font-weight:500;line-height:1.6;margin:44px 0 18px}h3{font-size:20px;font-weight:500;margin:30px 0 16px}p{margin:0 0 20px}ul,ol{padding-left:26px}li{margin:8px 0}.reading-toc{padding:18px 24px;border:1px solid #dedfd7;font-size:14px;margin:28px 0}.reading-toc ol{margin-bottom:0}.reading-toc a{text-decoration:none}.reading-toc summary{cursor:pointer}.reading-section{margin:0 0 42px}.reading-section>h2{border-bottom:1px solid #dedfd7;padding-bottom:12px}.block-sub{font-size:16px;color:#65716c}.content,.split,.copy,.explain-grid,.explain-grid>div{display:block;width:100%}.problem-box{padding:16px 20px;margin:18px 0;background:#eef1e9;border-left:3px solid #8b9f88}.problem-box b{display:block;font-size:13px;color:#61765d;margin-bottom:5px}.problem-box span{display:block}.reason b{display:block;margin-bottom:6px}.math,.math-block{overflow-x:auto;padding:14px 0;margin:18px 0;font-size:.95em}.math-inline{font-size:.95em}.katex-display{margin:.5em 0}figure{margin:28px 0}img{max-width:100%;height:auto;display:block}svg{display:block;width:100%;height:auto;margin:24px auto}figcaption,.caption{font-size:13px;color:#737e78;line-height:1.7;margin-top:12px}.speaker,.supplement{padding:15px 20px;border:1px solid #dedfd7;margin:20px 0;font-size:14px}.speaker summary,.supplement summary{cursor:pointer;color:#65716c}.speaker p{margin:14px 0 0}.block-bottom{font-size:12px;margin:12px 0}.sources{display:flex;gap:14px;flex-wrap:wrap}table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto;margin:24px 0}td,th{padding:10px;border-bottom:1px solid #dedfd7;text-align:left}th{background:#eef1e9}pre{overflow:auto;background:#f0f1eb;padding:18px;font-size:13px}code{font-family:ui-monospace,SFMono-Regular,monospace}blockquote{border-left:3px solid #9aab91;padding:4px 20px;color:#65716c;margin:24px 0}.editorial{border-left:3px solid #a2b49b;padding:5px 20px;margin:28px 0}.editorial h2{font-size:17px;margin:0 0 10px}.verification{font-size:13px;color:#69736c;padding:16px 20px;background:#eef1e9;margin:24px 0}.article-footer{border-top:1px solid #dedfd7;margin-top:44px;padding:24px 0 40px;font-size:12px;color:#737e78}.related{padding:20px 0}.related ul{font-size:15px}.draft-banner{background:#f4e6c9;color:#7e5b20;padding:12px 20px;font-size:13px}.math-error{color:#a43d2b;background:#fff1e9;font-family:monospace}.figure-wrap{overflow:auto}a[href^="#"]{scroll-margin-top:20px}.reading-section{scroll-margin-top:20px}.paper-note{font-size:13px;color:#737e78}.source-label{font-size:12px;color:#737e78}
+@media(max-width:640px){body{font-size:16px}.article-shell{padding:0 22px}.article-header{padding-top:30px}.article-header h1{font-size:27px}h2{font-size:22px}.reading-toc{padding:15px}.article-nav{gap:20px}.math-block{font-size:.85em}.speaker{padding:12px}.article-meta{gap:8px 15px}}
+@media print{.article-nav,.reading-toc{display:none}body{font-size:11pt;background:white}.article-shell{max-width:none;padding:0}details> *{display:block}.reading-section{break-inside:auto}a{color:inherit}.article-header{padding-top:0}}
+
+.math-block math{min-width:max-content;margin:auto}
+.reference-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.take{border-left:2px solid #a2b49b;padding:8px 14px;margin:14px 0}
+.reading-section svg{background:#fff;border:1px solid #e3e5dc}
+
+  </style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const meta=name=>document.querySelector(`meta[name="note:${name}"]`)?.content||'';
+  document.querySelectorAll('[data-note-field]').forEach(el=>{const value=meta(el.dataset.noteField);
+    el.textContent=value;
+    if(el.tagName==='TIME')el.dateTime=value;});
+  if(meta('status')!=='published'){const banner=document.createElement('div');banner.className='draft-banner';banner.textContent='私人草稿 · 此状态不会进入公开网站';document.body.prepend(banner);}
+  document.title=meta('title')+' · Research Notes';
+  const description=document.querySelector('meta[name=description]');
+  if(description)description.content=meta('summary');
+  document.querySelectorAll('.math-block,.math-inline').forEach(el=>{
+    if(el.querySelector('math'))return;
+    const tex=el.textContent;el.dataset.latex=tex;
+    try{katex.render(tex,el,{displayMode:el.classList.contains('math-block'),throwOnError:true,trust:false,strict:'warn'});}
+    catch(error){el.textContent=tex;el.classList.add('math-error');el.title=error.message;}
+  });
+});
+
+</script>
+</head>
+<body>
+  <div class="article-shell">
+    <nav class="article-nav" aria-label="文章导航">
+      <a href="/">Kida / Research Notes</a>
+      <a href="/archive/">全部文章 →</a>
+    </nav>
+    <main>
+      <article>
+        <header class="article-header">
+          <p class="eyebrow">专题总结 · RESEARCH NOTES</p>
+          <h1 data-note-field="title">长程信用分配：从五类证据找到局部学习信号</h1>
+          <p class="article-summary" data-note-field="summary">从重复状态、评价模型、信息进展、隐式奖励与决策层级理解局部信用的来源与边界。</p>
+          <div class="article-meta">
+            <span>首次发布 <time data-note-field="created" datetime="2026-11-15">2026-11-15</time></span>
+            <span>最近更新 <time data-note-field="updated" datetime="2026-11-15">2026-11-15</time></span>
+          </div>
+          <div class="tags">Agentic RL · Reward Modeling</div>
+        </header>
+
+<aside class="editorial">
+  <h2>阅读理解</h2>
+  <p>这五类是按主要证据和设计整理的阅读索引，可能互相重叠。选择方法前，先验证当前任务是否产生足够的局部证据。</p>
+</aside>
+
+<section class="reading-section" id="block-21">
+<h2>局部 advantage 的五个入口</h2>
+<p class="block-sub">现在撤掉“每一步的学习信号已经给对了”这个假设</p><div class="content"><div class="split"><div class="copy"><p class="lead">任务失败，<br/>每一步都该被惩罚吗？</p><div class="point">前四类主要看局部评价的证据来源。</div><div class="point">第五类改变评价和优化的时间尺度。</div><p class="small">按主要机制组织，允许交叉。</p></div><div class="visual"><svg role="img" viewbox="0 0 660 420" xmlns="http://www.w3.org/2000/svg"><defs><marker id="s20arrow167465" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#167465"></path></marker><marker id="s20arrow193e37" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#193e37"></path></marker><marker id="s20arrow74867d" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#74867d"></path></marker><marker id="s20arrowb77a36" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#b77a36"></path></marker><marker id="s20arrowbc6252" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#bc6252"></path></marker><marker id="s20arrow537b9e" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#537b9e"></path></marker><marker id="s20arrowd7e3db" markerheight="9" markerwidth="9" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8" fill="#d7e3db"></path></marker></defs><rect fill="#fff" height="60" rx="8" stroke="#d7e3db" stroke-width="2" width="600" x="30" y="25"></rect><text fill="#167465" font-size="21" font-weight="700" text-anchor="start" x="52" y="63">01 结构化轨迹</text><text fill="#74867d" font-size="20" font-weight="500" text-anchor="end" x="600" y="63">跨轨迹比较与连接</text><rect fill="#fff" height="60" rx="8" stroke="#d7e3db" stroke-width="2" width="600" x="30" y="101"></rect><text fill="#537b9e" font-size="21" font-weight="700" text-anchor="start" x="52" y="139">02 过程奖励 / Critic</text><text fill="#74867d" font-size="20" font-weight="500" text-anchor="end" x="600" y="139">模型评价局部质量</text><rect fill="#fff" height="60" rx="8" stroke="#d7e3db" stroke-width="2" width="600" x="30" y="177"></rect><text fill="#b77a36" font-size="21" font-weight="700" text-anchor="start" x="52" y="215">03 信息增益</text><text fill="#74867d" font-size="20" font-weight="500" text-anchor="end" x="600" y="215">任务相关信念进展</text><rect fill="#fff" height="60" rx="8" stroke="#d7e3db" stroke-width="2" width="600" x="30" y="253"></rect><text fill="#167465" font-size="21" font-weight="700" text-anchor="start" x="52" y="291">04 隐式信用</text><text fill="#74867d" font-size="20" font-weight="500" text-anchor="end" x="600" y="291">整体监督学习局部奖励</text><rect fill="#fff" height="60" rx="8" stroke="#d7e3db" stroke-width="2" width="600" x="30" y="329"></rect><text fill="#537b9e" font-size="21" font-weight="700" text-anchor="start" x="52" y="367">05 层级信用</text><text fill="#74867d" font-size="20" font-weight="500" text-anchor="end" x="600" y="367">改变决策时间尺度</text></svg></div></div></div><div class="block-bottom"><div class="sources"></div></div><details class="speaker"><summary>补充说明与适用边界</summary><p>五类不是互斥穷尽的正式分类，隐式奖励也可以看作PRM。</p></details>
+</section>
+<section class="reading-section" id="block-46">
+<h2>相似机制，可以交叉，不必强造继承</h2>
+<p class="block-sub">用这些边界回答“为什么归到这一类”</p><div class="content"><table><tbody><tr><th>路线</th><th>核心证据 / 设计</th><th>主要边界</th></tr><tr><td>结构化轨迹</td><td>重复状态和连通结构</td><td>相似观测不自动是相同状态</td></tr><tr><td>过程奖励 / Critic</td><td>模型估计局部评价或价值</td><td>评价器可能错，事后关联不等于因果</td></tr><tr><td>信息增益</td><td>任务答案信念的变化</td><td>代理进展，非一般环境新奇度</td></tr><tr><td>隐式信用</td><td>整体监督训练局部 log-ratio 奖励</td><td>也属于过程奖励，分解不唯一</td></tr><tr><td>层级信用</td><td>明确决策尺度，分层学习</td><td>与前四类可组合</td></tr></tbody></table></div><div class="block-bottom"><div class="sources"></div></div><details class="speaker"><summary>补充说明与适用边界</summary><p>GraphGPO与GiGPO有明确技术延伸，其他组主要作为机制对照。ArCHer作为基础工作出现，不以首发年份标成近期新论文。</p></details>
+</section>
+<section>
+  <h2>下一步核对</h2>
+  <p>状态重复很少、参考答案不可得时，哪个信号还能在任务失败后区分有价值的早期行动？</p>
+
+</section>
+<section class="related">
+  <h2>相关笔记</h2>
+  <ul><li><a href="/notes/gigpo/">GiGPO：同一状态下，不同尝试如何比较</a></li><li><a href="/notes/graphgpo/">GraphGPO：连接已有轨迹，重新分配局部信用</a></li><li><a href="/notes/sweet-rl/">SWEET-RL：让训练期参考信息帮助局部评价</a></li><li><a href="/notes/hcapo/">HCAPO：事后信息如何进入信用估计</a></li><li><a href="/notes/igpo/">IGPO：把正确答案的可预测性作为进展信号</a></li><li><a href="/notes/trace/">TRACE：从相对预测进展回看工具调用的价值</a></li><li><a href="/notes/istar/">iStar：从整体偏好中学习局部奖励</a></li><li><a href="/notes/itpo/">ITPO：把隐式奖励聚合到完整交互轮次</a></li><li><a href="/notes/archer/">ArCHer：在语言行动与 token 两个尺度学习</a></li><li><a href="/notes/hiper/">HiPER：区分规划、切换和执行的优势信号</a></li></ul>
+</section>
+
+      </article>
+    </main>
+    <footer class="article-footer">Research Notes · <a href="/rss.xml">RSS 订阅</a></footer>
+  </div>
+</body>
+</html>

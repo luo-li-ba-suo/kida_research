@@ -1,0 +1,10 @@
+<div class="note-list">
+{% for note in include.notes %}
+<article class="note-row">
+  <div class="note-date"><time datetime="{{ note.updated }}">{{ note.updated }}</time><span>{{ note.kind_label }}</span></div>
+  <div><h3><a href="{{ note.url }}">{{ note.title | escape }}</a></h3>
+  <p>{{ note.summary | escape }}</p>
+  <div class="tags">{% for label in note.direction_labels %}<span>{{ label }}</span>{% endfor %}{% for tag in note.tags limit:3 %}<span>{{ tag | escape }}</span>{% endfor %}</div></div>
+</article>
+{% endfor %}
+</div>

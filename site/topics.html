@@ -1,0 +1,7 @@
+---
+layout: page
+title: 专题
+permalink: /topics/
+---
+<div class="page-heading"><p class="eyebrow">CONNECT THE IDEAS</p><h1>专题线索</h1><p>把相邻的论文放在一起，追踪一个问题的不同解法。</p></div>
+{% assign topics = site.data.notes | where: 'kind', 'synthesis' %}{% include note-list.html notes=topics %}
