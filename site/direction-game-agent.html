@@ -1,0 +1,20 @@
+---
+layout: page
+title: GameAgent
+permalink: /directions/game-agent/
+---
+{% assign direction = site.data.directions | where: 'slug', 'game-agent' | first %}
+<div class="page-heading">
+  <p class="eyebrow">RESEARCH DIRECTION</p>
+  <h1>{{ direction.title }}</h1>
+  <p class="lead">{{ direction.question }}</p>
+  <p>{{ direction.text }}</p>
+</div>
+{% assign selected = site.data.notes | where_exp: 'note', "note.directions contains 'game-agent'" %}
+{% if selected.size > 0 %}
+  {% include note-list.html notes=selected %}
+{% else %}
+  <div class="empty-state">
+    <p>这个方向还没有发布笔记。你可以先浏览<a href="/archive/">全部文章</a>。</p>
+  </div>
+{% endif %}

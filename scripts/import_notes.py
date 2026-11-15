@@ -11,7 +11,10 @@ import shutil
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-DIRECTIONS = {'agentic-rl': 'Agentic RL', 'reward-modeling': 'Reward Modeling', 'social-intelligence': 'Social Intelligence'}
+DIRECTIONS = {
+    direction['slug']: direction['title']
+    for direction in json.loads((ROOT / 'site/_data/directions.json').read_text(encoding='utf-8'))
+}
 KINDS = {'paper': '论文精读', 'quicknote': '阅读速记', 'synthesis': '专题总结'}
 
 class Head(HTMLParser):

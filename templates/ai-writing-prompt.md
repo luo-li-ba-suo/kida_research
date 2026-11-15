@@ -6,6 +6,6 @@
 >
 > 选择 paper、quicknote 或 synthesis。速记可以只写一条新认识和一个下一步。长文补充推导时用 details 折叠。display 公式把 TeX 放进 class=math-block 的 div，行内公式用 class=math-inline 的 span。图片使用内嵌 SVG 或 data URI，附替代文本与来源。
 >
-> 填写 note:title、note:summary、note:slug、note:directions、note:tags、note:kind、note:created、note:updated、note:status。方向使用 agentic-rl、reward-modeling 或 social-intelligence，多个值用逗号分隔。slug 仅用小写英文字母、数字和连字符。文件名与 slug 相同。草稿状态默认 draft。创建日期与修订日期使用 YYYY-MM-DD。
+> 填写 note:title、note:summary、note:slug、note:directions、note:tags、note:kind、note:created、note:updated、note:status。方向使用 agentic-rl、reward-modeling、social-intelligence 或 game-agent，多个值用逗号分隔。slug 仅用小写英文字母、数字和连字符。文件名与 slug 相同。草稿状态默认 draft。创建日期与修订日期使用 YYYY-MM-DD。
 >
 > 修订旧文应保持 slug 和首次日期，只更新 note:updated 与相关正文。如果改了研究方向或类型，同时更新文章头部可见标签。保持 HTML 缩进清晰。只交付一个 HTML 文件。

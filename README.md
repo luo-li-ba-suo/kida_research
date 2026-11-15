@@ -1,6 +1,6 @@
 # Research Notes
 
-Kida 的个人研究博客，沿用 stormzhang 的 Jekyll 页面结构和部分排版样式。研究方向为 Agentic RL、Reward Modeling 和 Social Intelligence。
+Kida 的个人研究博客，沿用 stormzhang 的 Jekyll 页面结构和部分排版样式。研究方向为 Agentic RL、Reward Modeling、Social Intelligence 和 GameAgent。
 
 ## 更新一篇文章
 

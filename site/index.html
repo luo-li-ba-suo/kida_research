@@ -11,9 +11,13 @@ title: 首页
 <section aria-labelledby="directions-title">
   <div class="section-heading"><h2 id="directions-title">研究方向</h2></div>
   <div class="directions">
-    <a href="/directions/agentic-rl/"><h3>Agentic RL <span>↗</span></h3><p>如何从交互经验中，学到可靠的决策？</p><small>策略优化 · 信用分配 · 长程任务</small></a>
-    <a href="/directions/reward-modeling/"><h3>Reward Modeling <span>↗</span></h3><p>怎样把好的行为，转化为好的学习信号？</p><small>过程奖励 · 偏好学习 · 评价器</small></a>
-    <a href="/directions/social-intelligence/"><h3>Social Intelligence <span>↗</span></h3><p>智能体如何理解他人，并与他人协作？</p><small>社会推理 · 协作 · 多智能体</small></a>
+    {% for direction in site.data.directions %}
+    <a href="/directions/{{ direction.slug }}/">
+      <h3>{{ direction.title | escape }} <span aria-hidden="true">↗</span></h3>
+      <p>{{ direction.question | escape }}</p>
+      <small>{{ direction.keywords | escape }}</small>
+    </a>
+    {% endfor %}
   </div>
 </section>
 <section>
