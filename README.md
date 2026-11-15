@@ -19,7 +19,7 @@ Kida 的个人研究博客，沿用 stormzhang 的 Jekyll 页面结构和部分�
 
 ## 本地预览
 
-安装 Python 3.9+、Ruby 3.2.8 与 Bundler 2.4.22 后，在项目目录执行：
+安装 Python 3.9+、Ruby 3.2.11 与 Bundler 2.4.22 后，在项目目录执行：
 
 ```sh
 bundle install
