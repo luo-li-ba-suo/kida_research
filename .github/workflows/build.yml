@@ -14,4 +14,5 @@ jobs:
         with:
           bundler-cache: true
       - run: bash scripts/build.sh
+      - run: node tests/comments.cjs
       - run: python3 tests/publication.py

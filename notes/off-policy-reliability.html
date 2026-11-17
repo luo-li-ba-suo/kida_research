@@ -13,19 +13,42 @@
   <meta name="note:kind" content="synthesis">
   <meta name="note:created" content="2026-11-15">
   <meta name="note:updated" content="2026-11-15">
+  <meta name="note:paper-url" content="">
   <meta name="note:status" content="published">
   <style>
 /* Simple reading flow, independent of the old presentation's slide layout. */
 html{background:#fbfaf6;color:#263b38}body{margin:0;font:17px/1.95 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}*{box-sizing:border-box}a{color:#2e6258;text-underline-offset:4px}a:focus-visible,summary:focus-visible{outline:2px solid #2e6258;outline-offset:4px}.article-shell{max-width:870px;margin:auto;padding:0 40px}.article-nav{padding:24px 0;border-bottom:1px solid #dedfd7;display:flex;justify-content:space-between;font-size:13px}.article-nav a{text-decoration:none}.article-header{padding:48px 0 28px;border-bottom:1px solid #dedfd7;margin-bottom:30px}.eyebrow{font:11px/1.5 sans-serif;letter-spacing:.15em;color:#737e78}.article-header h1{font:500 34px/1.65 Georgia,"Songti SC",STSong,serif;letter-spacing:-.025em;margin:18px 0}.article-summary{color:#65716c;font-size:17px}.article-meta{font-size:12px;color:#737e78;display:flex;gap:14px;flex-wrap:wrap}.tags{font-size:12px;color:#2e6258;margin-top:12px}h2{font-size:24px;font-weight:500;line-height:1.6;margin:44px 0 18px}h3{font-size:20px;font-weight:500;margin:30px 0 16px}p{margin:0 0 20px}ul,ol{padding-left:26px}li{margin:8px 0}.reading-toc{padding:18px 24px;border:1px solid #dedfd7;font-size:14px;margin:28px 0}.reading-toc ol{margin-bottom:0}.reading-toc a{text-decoration:none}.reading-toc summary{cursor:pointer}.reading-section{margin:0 0 42px}.reading-section>h2{border-bottom:1px solid #dedfd7;padding-bottom:12px}.block-sub{font-size:16px;color:#65716c}.content,.split,.copy,.explain-grid,.explain-grid>div{display:block;width:100%}.problem-box{padding:16px 20px;margin:18px 0;background:#eef1e9;border-left:3px solid #8b9f88}.problem-box b{display:block;font-size:13px;color:#61765d;margin-bottom:5px}.problem-box span{display:block}.reason b{display:block;margin-bottom:6px}.math,.math-block{overflow-x:auto;padding:14px 0;margin:18px 0;font-size:.95em}.math-inline{font-size:.95em}.katex-display{margin:.5em 0}figure{margin:28px 0}img{max-width:100%;height:auto;display:block}svg{display:block;width:100%;height:auto;margin:24px auto}figcaption,.caption{font-size:13px;color:#737e78;line-height:1.7;margin-top:12px}.speaker,.supplement{padding:15px 20px;border:1px solid #dedfd7;margin:20px 0;font-size:14px}.speaker summary,.supplement summary{cursor:pointer;color:#65716c}.speaker p{margin:14px 0 0}.block-bottom{font-size:12px;margin:12px 0}.sources{display:flex;gap:14px;flex-wrap:wrap}table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto;margin:24px 0}td,th{padding:10px;border-bottom:1px solid #dedfd7;text-align:left}th{background:#eef1e9}pre{overflow:auto;background:#f0f1eb;padding:18px;font-size:13px}code{font-family:ui-monospace,SFMono-Regular,monospace}blockquote{border-left:3px solid #9aab91;padding:4px 20px;color:#65716c;margin:24px 0}.editorial{border-left:3px solid #a2b49b;padding:5px 20px;margin:28px 0}.editorial h2{font-size:17px;margin:0 0 10px}.verification{font-size:13px;color:#69736c;padding:16px 20px;background:#eef1e9;margin:24px 0}.article-footer{border-top:1px solid #dedfd7;margin-top:44px;padding:24px 0 40px;font-size:12px;color:#737e78}.related{padding:20px 0}.related ul{font-size:15px}.draft-banner{background:#f4e6c9;color:#7e5b20;padding:12px 20px;font-size:13px}.math-error{color:#a43d2b;background:#fff1e9;font-family:monospace}.figure-wrap{overflow:auto}a[href^="#"]{scroll-margin-top:20px}.reading-section{scroll-margin-top:20px}.paper-note{font-size:13px;color:#737e78}.source-label{font-size:12px;color:#737e78}
 @media(max-width:640px){body{font-size:16px}.article-shell{padding:0 22px}.article-header{padding-top:30px}.article-header h1{font-size:27px}h2{font-size:22px}.reading-toc{padding:15px}.article-nav{gap:20px}.math-block{font-size:.85em}.speaker{padding:12px}.article-meta{gap:8px 15px}}
+/* Keep the reading measure; use the left gutter for persistent navigation. */
+.reading-toc a{display:block;padding:4px 0;line-height:1.7;overflow-wrap:anywhere}
+.reading-toc a:hover{text-decoration:underline}
+@media screen and (min-width:1200px){
+  .article-shell:has(.reading-toc){width:870px;margin-left:calc(50% - 295px);margin-right:0}
+  .reading-toc{position:fixed;top:24px;left:max(24px,calc(50vw - 590px));width:250px;max-height:calc(100vh - 48px);max-height:calc(100dvh - 48px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#9aab91 #fbfaf6;margin:0;padding:16px 20px;background:#fbfaf6}
+  .reading-toc summary{font-weight:500}
+  .reading-toc ol{padding-left:22px;margin-top:12px}
+  .reading-toc li{margin:4px 0}
+}
 @media print{.article-nav,.reading-toc{display:none}body{font-size:11pt;background:white}.article-shell{max-width:none;padding:0}details> *{display:block}.reading-section{break-inside:auto}a{color:inherit}.article-header{padding-top:0}}
+.paper-link{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;min-height:44px;min-width:52px;margin-left:12px;color:#a12b32;text-decoration:none;white-space:nowrap}
+.paper-link svg{display:block;width:52px;height:24px;margin:0;overflow:visible}
+.paper-link:hover{color:#752027;background:#f3eeea}
+@media print{.paper-link{display:none}}
+
 
 .math-block math{min-width:max-content;margin:auto}
 .reference-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
 .take{border-left:2px solid #a2b49b;padding:8px 14px;margin:14px 0}
 .reading-section svg{background:#fff;border:1px solid #e3e5dc}
 
-  </style>
+  .article-comments{border-top:1px solid #dedfd7;margin-top:44px;padding-top:24px;scroll-margin-top:24px}
+.article-comments h2{margin:0 0 12px;font-size:22px}
+.article-comments p,.article-comments noscript{font-size:14px;line-height:1.8;color:#65716c}
+.article-comments [data-comments-mount]{min-width:0;width:100%}
+.article-comments .utterances{max-width:100%}
+.article-comments [data-comments-link]{display:inline-block;padding:8px 0;font-size:14px}
+@media print{.article-comments{display:none}}
+</style>
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
   const meta=name=>document.querySelector(`meta[name="note:${name}"]`)?.content||'';
@@ -36,6 +59,78 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.title=meta('title')+' · Research Notes';
   const description=document.querySelector('meta[name=description]');
   if(description)description.content=meta('summary');
+  const paperUrl=meta('paper-url');
+  const heading=document.querySelector('.article-header h1');
+  if(heading&&paperUrl){
+    try{
+      const url=new URL(paperUrl);
+      if(url.protocol==='https:'&&url.hostname==='arxiv.org'){
+        const link=document.createElement('a');link.className='paper-link';link.href=url.href;
+        link.target='_blank';link.rel='noopener noreferrer';
+        link.setAttribute('aria-label','Open original paper on arXiv (new tab)');link.title='arXiv';
+        link.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 28" aria-hidden="true" focusable="false"><text x="1" y="21" fill="currentColor" font-family="Georgia,serif" font-size="24">arXiv</text></svg>';
+        heading.append(link);
+      }
+    }catch(error){/* An empty or invalid paper URL leaves the title unchanged. */}
+  }
+  // Older notes and new templates get a directory from their section headings.
+  const article=document.querySelector('main article');
+  if(article&&!article.querySelector('.reading-toc')){
+    const headings=[...article.querySelectorAll('h2')];
+    if(headings.length){
+      const toc=document.createElement('details');toc.className='reading-toc';toc.open=true;
+      const summary=document.createElement('summary');summary.textContent='本文目录';toc.append(summary);
+      const list=document.createElement('ol');
+      headings.forEach((heading,index)=>{
+        if(!heading.id){
+          let id='section-'+(index+1);
+          while(document.getElementById(id))id+='-heading';
+          heading.id=id;
+        }
+        const item=document.createElement('li');const link=document.createElement('a');
+        link.href='#'+encodeURIComponent(heading.id);link.textContent=heading.textContent;
+        item.append(link);list.append(item);
+      });
+      toc.append(list);
+      const header=article.querySelector('.article-header');
+      if(header)header.after(toc);else article.prepend(toc);
+    }
+  }
+  // Comment threads follow the note slug across title and domain changes.
+  const comments=document.querySelector('.article-comments');
+  if(comments){
+    const status=comments.querySelector('[data-comments-status]');
+    const mount=comments.querySelector('[data-comments-mount]');
+    const discussion=comments.querySelector('[data-comments-link]');
+    const slug=meta('slug');
+    const repo='luo-li-ba-suo/kida_research';
+    const term='notes/'+slug+'/';
+    discussion.href='https://github.com/'+repo+'/issues?q='+encodeURIComponent('is:issue "'+term+'"');
+    if(meta('status')!=='published'||!/^https?:$/.test(location.protocol)){
+      status.textContent='评论在已发布的网站上开放。本地文件和草稿不加载评论服务。';
+      discussion.hidden=true;
+    }else{
+      let loaded=false;
+      const loadComments=()=>{
+        if(loaded)return;
+        loaded=true;
+        status.textContent='正在加载评论…';
+        const script=document.createElement('script');
+        script.src='https://utteranc.es/client.js';script.async=true;
+        script.setAttribute('repo',repo);script.setAttribute('issue-term',term);
+        script.setAttribute('theme','github-light');script.setAttribute('crossorigin','anonymous');
+        script.onload=()=>{status.textContent='使用 GitHub 登录后即可留言。首条评论会创建本篇讨论。';};
+        script.onerror=()=>{status.textContent='评论暂时无法加载，可通过下方链接在 GitHub 查看讨论，或刷新页面重试。';};
+        mount.append(script);
+      };
+      if('IntersectionObserver' in window){
+        const observer=new IntersectionObserver(entries=>{
+          if(entries.some(entry=>entry.isIntersecting)){observer.disconnect();loadComments();}
+        },{rootMargin:'300px'});
+        observer.observe(comments);
+      }else loadComments();
+    }
+  }
   document.querySelectorAll('.math-block,.math-inline').forEach(el=>{
     if(el.querySelector('math'))return;
     const tex=el.textContent;el.dataset.latex=tex;
@@ -43,7 +138,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     catch(error){el.textContent=tex;el.classList.add('math-error');el.title=error.message;}
   });
 });
-
 </script>
 </head>
 <body>
@@ -93,6 +187,13 @@ document.addEventListener('DOMContentLoaded',()=>{
 </section>
 
       </article>
+    <section class="article-comments" id="comments" aria-labelledby="comments-title">
+      <h2 id="comments-title">评论</h2>
+      <p data-comments-status role="status">欢迎交流对论文的理解与疑问。评论需使用 GitHub 账号登录。</p>
+      <div data-comments-mount></div>
+      <a data-comments-link href="https://github.com/luo-li-ba-suo/kida_research/issues" target="_blank" rel="noopener noreferrer">在 GitHub 查看讨论 ↗</a>
+      <noscript>启用 JavaScript 后可在此查看和发表留言，也可以前往 GitHub 仓库的 Issues 查看讨论。</noscript>
+    </section>
     </main>
     <footer class="article-footer">Research Notes · <a href="/rss.xml">RSS 订阅</a></footer>
   </div>

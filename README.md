@@ -14,6 +14,8 @@ Kida 的个人研究博客，沿用 stormzhang 的 Jekyll 页面结构和部分�
 - [完整 HTML 模板](templates/your-note.html)
 - [阅读速记样例](templates/example-reading-quicknote.html)
 - [AI 写作提示词](templates/ai-writing-prompt.md)
+- [文章页面设计与维护约定](DESIGN.md)
+- [文章评论启用与维护](docs/comments.md)
 - [Cloudflare 部署步骤](docs/deploy.md)
 - [知识库迁移对照](docs/migration.md)
 
